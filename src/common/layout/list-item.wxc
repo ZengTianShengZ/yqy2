@@ -1,0 +1,18 @@
+<template>
+  <view>
+    <view class="top"></view>
+    <view class="content"></view>
+    <view class="img-content"></view>
+
+  </view>
+</template>
+
+<script>
+export default {
+
+}
+</script>
+
+<style>
+
+</style>

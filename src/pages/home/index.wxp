@@ -1,0 +1,42 @@
+<template>
+    <view>
+        <list-item></list-item>
+    </view>
+</template>
+
+
+<script>
+    const api = require('../../api/index.js')
+    const app = getApp()
+
+    export default {
+        config: {
+            usingComponents: {
+                "list-item": '../../common/layout/list-item'
+            }
+        },
+        data: {},
+        onLoad: function () {
+//            const name = app.globalData.name
+            this.getData()
+
+        },
+        getData() {
+            const location = app.getLocation()
+            console.log(location)
+            api.getDynamic({
+                location: `${location.longitude},${location.latitude}`,
+                pageNum: 0,   //????
+                pageSize: 10   //????
+            }).then(r => {
+                console.log(r)
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+    }
+</script>
+
+<style>
+
+</style>

@@ -1,0 +1,10 @@
+{
+  "name": "yqy2",
+  "description": "MinUI",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {},
+  "minConfig": {
+    "projectType": "application"
+  }
+}

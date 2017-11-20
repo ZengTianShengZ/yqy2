@@ -1,0 +1,137 @@
+<template>
+    <page></page>
+</template>
+
+<script>
+    const QQMapWX = require('./libs/qqmap-sdk')
+    const storage = require('./libs/storage')
+    export default {
+        config: {
+            usingComponents: {
+                'layout-head': 'layout/head',
+                'layout-foot': 'layout/foot'
+            },
+            pages: [],
+            window: {
+                backgroundTextStyle: 'dark',
+                backgroundColor: '#efefef',
+                navigationBarBackgroundColor: '#ffffff',
+                navigationBarTitleText: 'MinUI',
+                navigationBarTextStyle: 'black'
+            },
+            tabBar: {
+                color: '#8a8a8a',
+                selectedColor: '#28b1b0',
+                borderStyle: 'black',
+                backgroundColor: '#ffffff',
+                list: [
+                    {
+                        pagePath: 'pages/home/index',
+                        iconPath: 'common/assets/tab/coms-normal.png',
+                        selectedIconPath: 'common/assets/tab/coms-active.png',
+                        text: '???'
+                    },
+                    {
+                        pagePath: 'pages/about/index',
+                        iconPath: 'common/assets/tab/about-normal.png',
+                        selectedIconPath: 'common/assets/tab/about-active.png',
+                        text: '???'
+                    }
+                ]
+            },
+            networkTimeout: {
+                request: 10000
+            }
+        },
+        globalData: {
+            name: 'zss'
+        },
+        onLaunch: function () {
+            this.qQMapWX = new QQMapWX({
+                key: 'OY5BZ-3I5WS-BN5OF-6F4RA-NYQRJ-TKFAA' // ??
+            })
+            wx.getLocation({
+                type: 'wgs84',
+                success: function (res) {
+                    storage.set('location', res)
+                }
+            })
+        },
+        onShow: function () {
+        },
+        onHide: function () {
+        },
+        getQQMapWX() {
+            return this.qQMapWX
+        },
+        getLocation() {
+            return storage.get('location')
+        },
+        getTokenInfo() {
+            return new Promise((resolve, reject) => {
+                const userInfo = storage.get('userInfo')
+                if (userInfo) {
+                    resolve(userInfo)
+                } else {
+                    let info = {}
+                    wx.login({
+                        success: function (res) {
+                            const code = res.code
+                            if (code) {
+                                //??????
+                                wx.getUserInfo({
+                                    success: function (res) {
+                                        var userInfo = res.userInfo
+                                        var nickName = userInfo.nickName
+                                        var avatarUrl = userInfo.avatarUrl
+                                        var gender = userInfo.gender //?? 0????1???2??
+                                        var province = userInfo.province
+                                        var city = userInfo.city
+                                        var country = userInfo.country
+                                        info = {
+                                            nickName, avatarUrl, gender, province, city, country
+                                        }
+                                        //??????
+                                        wx.request({
+                                            url: 'https://yqy.mynatapp.cc/v2/login',
+                                            method: 'POST',
+                                            data: {
+                                                code,
+                                                nickName,
+                                                avatarUrl,
+                                                province,
+                                                gender,
+                                                city,
+                                                country
+                                            },
+                                            success: function (res) {
+                                                info.openId = res.data.data.openId
+                                                storage.set('userInfo', info)
+                                                resolve(info)
+                                            },
+                                            fail: function (err) {
+                                                reject(err)
+                                            }
+                                        })
+                                    }
+                                })
+                            } else {
+                                console.log('??????????' + res.errMsg)
+                                reject(res.errMsg)
+                            }
+                        },
+                        fail: function(err){
+                            reject(err)
+                        }
+                    })
+                }
+            })
+        }
+    }
+</script>
+
+<style>
+    @import './common/assets/style/reset.wxss';
+    @import './common/assets/style/icon.pcss';
+    @import './common/assets/style/transform.wxss';
+</style>
