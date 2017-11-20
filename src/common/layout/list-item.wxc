@@ -1,18 +1,119 @@
-<template>
-  <view>
-    <view class="top"></view>
-    <view class="content"></view>
-    <view class="img-content"></view>
+<style>
+    @import '../../common/assets/style/layout.wxss';
 
-  </view>
+    .list-item{
+        padding:0 20rpx 20rpx;
+        box-sizing: border-box;
+    }
+    .top{
+        padding-top: 20rpx;
+        border-top: 1px solid rgba(0,0,0,0.2);
+    }
+    .avatarUrl{
+        display: block;
+        width: 120rpx;
+        height: 100rpx;
+        border-radius: 50rpx;
+    }
+    .top-right{
+        width: 100%;
+        margin-left: 20rpx;
+    }
+    .top-name{
+        font-size: 36rpx;
+    }
+    .top-time{
+        font-size: 28rpx;
+        color: #888888;
+    }
+    .top-address{
+        margin-right: 10rpx;
+    }
+    .content{
+        margin: 10rpx 0;
+        font-size: 38rpx;
+        color: #343434;
+    }
+    .img-content{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .img-item{
+        width: 33.33%;
+        height: 220rpx;
+        padding: 3rpx;
+        box-sizing: border-box;
+    }
+</style>
+<template>
+    <view class="list-item">
+        <view class="top f-js-ac">
+            <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
+            <view class="top-right">
+                <view class="'top-name">{{itemData.nickName}}</view>
+                <view class="top-time">
+                    <text>{{itemData.time}}</text>
+                    <wxc-icon class="fr" size="26" type="location"></wxc-icon>
+                    <text class="top-address fr">{{itemData.address}}</text>
+                </view>
+            </view>
+        </view>
+        <view class="content">
+            {{itemData.description}}
+        </view>
+        <view class="img-content">
+            <image class="img-item"
+                   wx:for="{{itemData.imgList}}"
+                   src="{{item}}"
+                   wx:key='index'
+                   data-imgUrl='{{item}}'
+                   data-imgUrls='{{itemData.imgList}}'
+                   bindtap='clickPreviewImage'></image>
+        </view>
+    </view>
 </template>
 
 <script>
-export default {
 
-}
+    export default {
+        config: {
+            usingComponents: {
+                "wxc-icon": '@minui/wxc-icon'
+            }
+        },
+        properties: {
+            itemData: {
+                type: Object,
+                value: {
+//                    address: "纳德大酒店",
+//                    avatarUrl: "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                    createdAt: "2017-11-15T15:43:48.266Z",
+//                    description: "神挡杀神苦上加，苦我空间技术时刻，监控申卡几点开始代扣代缴",
+//                    imgList:x ["https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0",
+//                        "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKApG4aicW5835FUgOBY75jRDaYt8B84YIQL6v9J9lI4KEPA1nicGNxtdlI5iamIosXiaRqiavDAXmW2rQ/0"],
+//                    joinIdList: [],
+//                    location: [120.15507, 30.274085],
+//                    nickName: "曾田生",
+//                    openId: "opRED0WUH13tzQnc3R59bZCyg9YU",
+//                    time: "11月15号",
+//                    _id: "5a0c60b4ba97b7fac9ce8cdb"
+                }
+            }
+        },
+        methods: {
+            clickPreviewImage(event) {
+                wx.previewImage({
+                    current: event.currentTarget.dataset.imgurl,
+                    urls: event.currentTarget.dataset.imgurls,
+                    success: function (res) {
+                    }
+                })
+            },
+        }
+    }
 </script>
-
-<style>
-
-</style>

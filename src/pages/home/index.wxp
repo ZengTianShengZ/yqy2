@@ -1,6 +1,12 @@
 <template>
     <view>
-        <list-item></list-item>
+        <list-item
+                wx:for="{{obj_resData.list}}"
+                itemData="{{item}}"
+                wx:key='index'
+        ></list-item>
+        <wxc-loadmore wx:if='{{loadmoreFlag}}' text="???..." icon="{{true}}"></wxc-loadmore>
+        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="???" is-end="{{true}}"></wxc-loadmore>
     </view>
 </template>
 
@@ -11,28 +17,83 @@
 
     export default {
         config: {
+            enablePullDownRefresh: true,
+            onReachBottomDistance: 50,
             usingComponents: {
-                "list-item": '../../common/layout/list-item'
+                "list-item": '../../common/layout/list-item',
+                "wxc-loadmore": '@minui/wxc-loadmore'
             }
         },
-        data: {},
-        onLoad: function () {
-//            const name = app.globalData.name
-            this.getData()
-
-        },
-        getData() {
-            const location = app.getLocation()
-            console.log(location)
-            api.getDynamic({
-                location: `${location.longitude},${location.latitude}`,
+        data: {
+            obj_resData:{
+                list:[],
                 pageNum: 0,   //????
                 pageSize: 10   //????
-            }).then(r => {
-                console.log(r)
+            },
+            loadmoreFlag: false,
+            loadmoreIsEndFlag: false
+        },
+        onLoad: function () {
+            this.getData()
+        },
+        getData(flag) {
+            wx.showLoading({title:"???..."})
+            const location = app.getLocation()
+            let {pageNum, pageSize} = this.data.obj_resData
+            if (flag === 'moreFlag') {
+                pageNum += 1
+            }
+            api.getDynamic({
+                location: `${location.longitude},${location.latitude}`,
+                pageNum: pageNum,
+                pageSize: pageSize
+            }).then(res => {
+                wx.stopPullDownRefresh()
+                wx.hideLoading()
+                this.setData({loadmoreFlag: false})
+                let list = this.data.obj_resData.list
+                console.log(list)
+                let addList = res.data.list
+                list.push(addList)
+                console.log(list)
+                this.setData({
+                    obj_resData:{
+                        list: addList,
+                        pageNum: res.data.pageNum,
+                        pageSize: res.data.pageSize,
+                        totalPageNum: res.data.totalPageNum
+                    }
+
+                });
             }).catch(err => {
+                wx.hideLoading()
+                wx.stopPullDownRefresh()
+                this.setData({loadmoreFlag: false})
                 console.log(err)
             })
+        },
+        onPullDownRefresh() {
+            this.setData({
+                obj_resData: {
+                    list: [],
+                    pageNum: 0,
+                    pageSize: 10
+                }
+            })
+            this.getData()
+        },
+        onReachBottom() {
+            const loadmoreFlag = this.data.loadmoreFlag
+            if (loadmoreFlag) {
+                return
+            }
+            const {pageNum, totalPageNum} = this.data.obj_resData
+            if (pageNum >= (totalPageNum - 1)) {
+                this.setData({loadmoreIsEndFlag: true})
+                return
+            }
+            this.setData({loadmoreFlag: true})
+            this.getData('moreFlag')
         }
     }
 </script>

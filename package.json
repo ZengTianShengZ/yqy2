@@ -3,7 +3,10 @@
   "description": "MinUI",
   "version": "1.0.0",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@minui/wxc-icon": "^1.0.2",
+    "@minui/wxc-loadmore": "^1.0.2"
+  },
   "minConfig": {
     "projectType": "application"
   }

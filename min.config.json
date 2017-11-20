@@ -8,8 +8,9 @@
     "darkPromptColor": "#999999",
     "splitLineColor": "#ECECEC",
     "backgroundColour": "#EFEFEF"
-  }, 
-  "dest": "dist", 
-  "npm": { 
+  },
+  "dest": "dist",
+  "npm": {
+    "dest": "dist/packages"
   }
 }
