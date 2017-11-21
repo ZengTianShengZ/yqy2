@@ -68,7 +68,8 @@
                    wx:key='index'
                    data-imgUrl='{{item}}'
                    data-imgUrls='{{itemData.imgList}}'
-                   bindtap='clickPreviewImage'></image>
+                   bindtap='clickPreviewImage'>
+            </image>
         </view>
     </view>
 </template>
