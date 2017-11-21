@@ -1,26 +1,54 @@
+<style>
+    .send-dynamic-btn{
+        position: fixed;
+        bottom: 60rpx;
+        left: 60rpx;
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 40rpx;
+        background: #FFFFFF;
+        transition: all .5s ease-in;
+    }
+    .icon-add{
+        width: 80rpx;
+        height: 80rpx;
+    }
+    .imgIconAminDown{
+        transform:translate(0,50px);
+    }
+    .imgIconAminUp{
+        transform:translate(0,-50px);
+    }
+
+</style>
+
 <template>
-    <view>
-        <list-item
+     <view class="page-home">
+         <list-item
                 wx:for="{{obj_resData.list}}"
                 itemData="{{item}}"
                 wx:key='index'>
         </list-item>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
-    </view>
-</template>
+        <view class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
+            <image class="icon-add" src="../../image/icon/iconAdd.png"></image>
+        </view>
+     </view>
+ </template>
 
 <script>
     const api = require('../../api/index.js')
     const app = getApp()
-
+    let scrollOldTo = 0
     export default {
         config: {
             enablePullDownRefresh: true,
             onReachBottomDistance: 60,
             usingComponents: {
                 "list-item": '../../common/layout/list-item',
-                "wxc-loadmore": '@minui/wxc-loadmore'
+                "wxc-loadmore": '@minui/wxc-loadmore',
+                "wxc-icon": '@minui/wxc-icon'
             }
         },
         data: {
@@ -30,7 +58,8 @@
                 pageSize: 10   //????
             },
             loadmoreFlag: false,
-            loadmoreIsEndFlag: false
+            loadmoreIsEndFlag: false,
+            b_directionYup: true
         },
         onLoad: function () {
             this.getData()
@@ -86,10 +115,25 @@
             }
             this.setData({loadmoreFlag: true})
             this.getData('moreFlag')
-        }
+        },
+        /**
+         * 监听页面滚动
+         * @param obj
+         */
+//        onPageScroll(obj) {
+//            if(obj.scrollTop > scrollOldTo) {
+//                console.log('..1.')
+//                this.setData({
+//                    b_directionYup: true
+//                })
+//            } else {
+//                console.log('..2.')
+//
+//                this.setData({
+//                    b_directionYup: false
+//                })
+//            }
+//            scrollOldTo = obj.scrollTop
+//        },
     }
 </script>
-
-<style>
-
-</style>

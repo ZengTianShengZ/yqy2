@@ -1,17 +1,104 @@
+<style>
+    .section{
+
+    }
+    .textarea-text{
+        width: 100%;
+        height: 200rpx;
+        padding: 20rpx;
+        color: #696969;
+        font-size: 36rpx;
+        box-sizing: border-box;
+    }
+    .choose-image{
+        width: 100%;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .choose-image{
+        padding: 0 8rpx;
+        box-sizing: border-box;
+    }
+    .choose-block {
+        display: inline-block;
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    .choose-block .close-image-btn{
+        position: absolute;
+        top: -12rpx;
+        right: -4rpx;
+        z-index: 1;
+        width: 45rpx;
+        height: 45rpx;
+    }
+    .choose-image .image-item{
+        width: 160rpx;
+        height: 160rpx;
+        margin-right: 22rpx;
+    }
+    .choose-image .choose-image-btn{
+        width: 160rpx;
+        height: 160rpx;
+    }
+    .icon-address{
+        width: 100%;
+        margin: 20rpx 0;
+    }
+    .icon-address .img-icon{
+        width: 40rpx;
+        height: 40rpx;
+        margin: 0 20rpx;
+        vertical-align: -5rpx;
+    }
+    .icon-address .text-ng{
+        font-size: 34rpx;
+        color: #8A8A8A;
+    }
+    .send-btn-box{
+        width: 100%;
+        position: fixed;
+        left: 0;
+        bottom: 40rpx;
+    }
+    .send-btn{
+        margin-top: 30rpx;
+        width: 90%;
+        color: #ffffff;
+        background: #FEC4AA;
+    }
+</style>
 <template>
-    <view>
-        <list-item
-                wx:for="{{obj_resData.list}}"
-                itemData="{{item}}"
-                wx:key='index'>
-        </list-item>
-        <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
-        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
+    <view class="section">
+        <form bindsubmit="bindFormSubmit">
+            <view>
+                <textarea class='textarea-text'  name="textarea" placeholder="一起吖~" />
+            </view>
+            <view class='choose-image'>
+                <block class="image-list" wx:if='{{imgTempFilePaths.length > 0}}'>
+                    <view class="choose-block" wx:for='{{imgTempFilePaths}}' wx:key='index'>
+                        <image class="close-image-btn" data-closeImgIndex='{{index}}' bindtap="closeImgBtnClick" src="../../images/icon/iconClose.png"></image>
+                        <image class="image-item" src="{{item}}"></image>
+                    </view>
+                </block>
+                <image class="choose-image-btn" wx:if='{{imgTempFilePaths.length < 9}}' bindtap="chooseImgBtnClick" src="../../images/icon/iconAddImg.png"></image>
+            </view>
+            <view class='icon-address' bindtap="chooseLocationBtnClick" >
+                <image class="img-icon" src="../../images/icon/iconAddress.png"></image>
+                <text class="text-ng">{{str_address}}</text>
+            </view>
+            <view class='send-btn-box'>
+                <button class='send-btn'  form-type="submit"> 发送 </button>
+            </view>
+        </form>
     </view>
 </template>
 
 <script>
-    const api = require('../../api/index.js')
+    const storage = require('../../libs/storage')
+    const qiniuUploader = require("../../utils/qiniuUploader")
+    const config = require("../../config/index")
+    const api = require('../../api/index')
     const app = getApp()
 
     export default {
@@ -24,72 +111,136 @@
             }
         },
         data: {
-            obj_resData:{
-                list:[],
-                pageNum: 0,   //????
-                pageSize: 10   //????
-            },
-            loadmoreFlag: false,
-            loadmoreIsEndFlag: false
+            imgTempFilePaths: [],
+            str_address: '',
+            str_description: ''
         },
-        onLoad: function () {
-            this.getData()
+        onLoad() {
+            this.initLocationAddress()
         },
-        getData(flag) {
-            wx.showLoading({title:"加载..."})
-            const location = app.getLocation()
-            let {pageNum, pageSize} = this.data.obj_resData
-            if (flag === 'moreFlag') {
-                pageNum += 1
-            }
-            api.getDynamic({
-                location: `${location.longitude},${location.latitude}`,
-                pageNum: pageNum,
-                pageSize: pageSize
-            }).then(res => {
-                this.setData({
-                    obj_resData:{
-                        list: [...this.data.obj_resData.list, ...res.data.list],
-                        pageNum: res.data.pageNum,
-                        pageSize: res.data.pageSize,
-                        totalPageNum: res.data.totalPageNum
-                    }
-                });
-            }).catch(err => {
-                console.log(err)
-            }).then(() => {
-                wx.hideLoading()
-                wx.stopPullDownRefresh()
-                this.setData({loadmoreFlag: false})
+        initLocationAddress() {
+            let _this = this
+            const location = storage.get('location')
+            app.getQQMapWX().reverseGeocoder({
+                location: {
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                },
+                success: function(res) {
+                    _this.setData({
+                        str_address: `${res.result.address_component.district}•${res.result.address_component.street}`
+                    })
+                },
+                fail: function(res) {
+                    _this.setData({
+                        str_address: '请点击此处选择地址...'
+                    })
+                }
+            });
+        },
+        closeImgBtnClick(event) {
+            let closeimgindex = event.currentTarget.dataset.closeimgindex
+            let imgTempFilePaths = this.data.imgTempFilePaths
+            //arr.splice(closeimgindex,1) 有问题不知道为什么，才用以下方法
+            let imgTempFilePathsx = imgTempFilePaths.slice(0,closeimgindex).concat(imgTempFilePaths.slice(closeimgindex+1,imgTempFilePaths.length))
+            this.setData({
+                imgTempFilePaths: imgTempFilePathsx
             })
         },
-        onPullDownRefresh() {
-            this.setData({loadmoreIsEndFlag: false})
-            this.setData({
-                obj_resData: {
-                    list: [],
-                    pageNum: 0,
-                    pageSize: 10
+        chooseImgBtnClick(){
+            let _this = this
+            let imgTempFilePaths = this.data.imgTempFilePaths
+            wx.chooseImage({
+                count: 9 - imgTempFilePaths.length, // 默认9
+                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+                success: function (res) {
+                    // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+                    _this.setData({
+                        imgTempFilePaths: res.tempFilePaths.concat(imgTempFilePaths)
+                    })
                 }
             })
-            this.getData()
         },
-        onReachBottom() {
-            const loadmoreFlag = this.data.loadmoreFlag
-            if (loadmoreFlag) {
-                return
+        chooseLocationBtnClick() {
+            let _this = this
+            wx.chooseLocation({
+                success: function(res) {
+                    console.log(res);
+                    _this.setData({
+                        str_address: res.name
+                    })
+                }
+            })
+        },
+        bindFormSubmit(e) {
+            this.setData({
+                str_description: e.detail.value.textarea
+            })
+            app.getTokenInfo().then(res => {
+                console.log(res)
+                if (res.openId) {
+                    this.uploadFiles()
+                } else {
+                    console.log('openId x 不存在')
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+        },
+        uploadFiles(){
+            const _this = this
+            const imgUrlList = this.data.imgTempFilePaths
+            // 生成一个Promise对象的数组
+            var promises = imgUrlList.map(function (item) {
+                return new Promise((reslove, reject) => {
+                    // 交给七牛上传
+                    qiniuUploader.upload(item, (res) => {
+                        reslove(res)
+                    }, (error) => {
+                        console.log('error: ' + error);
+                    }, config.qnConfig);
+                })
+            });
+            Promise.all(promises).then(function (res) {
+                let imgListStr =''
+                res.forEach(item => {
+                    imgListStr += item.imageURL + ','
+                })
+                imgListStr = imgListStr.substring(0, imgListStr.length - 1)
+                _this.sendDynamic(imgListStr)
+            }).catch(function (reason) {
+                console.log('.......文件上传出错')
+                console.log(reason)
+            });
+        },
+        async sendDynamic(imgList) {
+            const str_address = this.data.str_address
+            const str_description = this.data.str_description
+            try {
+                const location = storage.get('location')
+                const userInfo = await app.getTokenInfo()
+                console.log(userInfo)
+                if (!userInfo.openId) {
+                    console.log('openId  不存在')
+                    return
+                }
+                const sendData = {
+                    openId: userInfo.openId,
+                    nickName: userInfo.nickName,
+                    avatarUrl: userInfo.avatarUrl,
+                    location: `${location.longitude},${location.latitude}`,
+                    address: str_address,
+                    description: str_description,
+                    imgList: imgList
+                }
+                console.log(sendData)
+                let res = await api.postDynamic(sendData)
+                console.log(res)
+            } catch (err) {
+                console.log(err)
             }
-            const {pageNum, totalPageNum} = this.data.obj_resData
-            if (pageNum >= (totalPageNum - 1)) {
-                this.setData({loadmoreIsEndFlag: true})
-                return
-            }
-            this.setData({loadmoreFlag: true})
-            this.getData('moreFlag')
         }
     }
 </script>
 
-<style>
-
-</style>
