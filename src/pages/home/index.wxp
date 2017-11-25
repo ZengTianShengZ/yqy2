@@ -31,13 +31,14 @@
         </list-item>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
-        <view class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
+        <view bindtap="clickNavigateToSendDyPage" class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
             <image class="icon-add" src="../../image/icon/iconAdd.png"></image>
         </view>
      </view>
  </template>
 
 <script>
+    const storage = require('../../libs/storage')
     const api = require('../../api/index.js')
     const app = getApp()
     let scrollOldTo = 0
@@ -61,8 +62,15 @@
             loadmoreIsEndFlag: false,
             b_directionYup: true
         },
-        onLoad: function () {
+        onLoad: function (option) {
             this.getData()
+        },
+        onShow: function() {
+            const refreshData = storage.get('refreshData')
+            if (refreshData) {
+                storage.set('refreshData', false)
+                this.onStartPullDownRefresh()
+            }
         },
         getData(flag) {
             wx.showLoading({title:"加载..."})
@@ -92,7 +100,7 @@
                 this.setData({loadmoreFlag: false})
             })
         },
-        onPullDownRefresh() {
+        refreshData() {
             this.setData({loadmoreIsEndFlag: false})
             this.setData({
                 obj_resData: {
@@ -102,6 +110,19 @@
                 }
             })
             this.getData()
+        },
+        /**
+         * 下拉触发刷新
+         **/
+        onPullDownRefresh() {
+            this.refreshData()
+        },
+        /**
+         * 需要调用触发刷新
+         **/
+        onStartPullDownRefresh() {
+            wx.startPullDownRefresh()
+            this.refreshData()
         },
         onReachBottom() {
             const loadmoreFlag = this.data.loadmoreFlag
@@ -115,6 +136,11 @@
             }
             this.setData({loadmoreFlag: true})
             this.getData('moreFlag')
+        },
+        clickNavigateToSendDyPage() {
+            wx.navigateTo({
+                url: '../sendDynamic/index'
+            })
         },
         /**
          * 监听页面滚动

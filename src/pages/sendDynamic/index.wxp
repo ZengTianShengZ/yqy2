@@ -88,10 +88,16 @@
                 <text class="text-ng">{{str_address}}</text>
             </view>
             <view class='send-btn-box'>
-                <button class='send-btn'  form-type="submit"> 发送 </button>
+                <button class='send-btn'  form-type="submit"> 分享 </button>
             </view>
         </form>
     </view>
+    <wxc-toast
+            is-show="{{$toast.show}}"
+            text="{{$toast.text}}"
+            icon="{{$toast.icon_str}}"
+            icon-image="{{$toast.icon_image}}">
+    </wxc-toast>
 </template>
 
 <script>
@@ -106,14 +112,22 @@
             enablePullDownRefresh: true,
             onReachBottomDistance: 60,
             usingComponents: {
-                "list-item": '../../common/layout/list-item',
-                "wxc-loadmore": '@minui/wxc-loadmore'
+                "wxc-toast":'@minui/wxc-toast'
             }
         },
         data: {
             imgTempFilePaths: [],
             str_address: '',
-            str_description: ''
+            str_description: '',
+            $toast: {
+                show:false,
+                text: '正在上传 ~~',
+                iconShow: true,
+                icon_image: '',
+                duration: '',
+                icon_str: ''  // 'yes', ''
+            },
+            icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad() {
             this.initLocationAddress()
@@ -173,16 +187,19 @@
                 }
             })
         },
+        /**
+         * 发布
+         * @param e
+         */
         bindFormSubmit(e) {
             this.setData({
                 str_description: e.detail.value.textarea
             })
             app.getTokenInfo().then(res => {
-                console.log(res)
                 if (res.openId) {
                     this.uploadFiles()
                 } else {
-                    console.log('openId x 不存在')
+                    console.log('openId 不存在')
                 }
             }).catch(err => {
                 console.log(err)
@@ -190,7 +207,20 @@
         },
         uploadFiles(){
             const _this = this
+            const description = this.data.str_description
             const imgUrlList = this.data.imgTempFilePaths
+
+            if (!description && imgUrlList.length <=0) {
+                this.$toast({
+                    text: '请分享文字和图片',
+                    duration: 2000
+                })
+                return
+            }
+            this.$toast({
+                text: '正在上传 ~~',
+                icon_image: _this.data.icon_image
+            })
             // 生成一个Promise对象的数组
             var promises = imgUrlList.map(function (item) {
                 return new Promise((reslove, reject) => {
@@ -210,19 +240,24 @@
                 imgListStr = imgListStr.substring(0, imgListStr.length - 1)
                 _this.sendDynamic(imgListStr)
             }).catch(function (reason) {
-                console.log('.......文件上传出错')
                 console.log(reason)
+                this.$toast({
+                    text: '图片上传出错',
+                    duration: 2000
+                })
             });
         },
-        async sendDynamic(imgList) {
+        sendDynamic(imgList) {
             const str_address = this.data.str_address
             const str_description = this.data.str_description
-            try {
-                const location = storage.get('location')
-                const userInfo = await app.getTokenInfo()
+            const location = storage.get('location')
+            app.getTokenInfo().then(userInfo => {
                 console.log(userInfo)
                 if (!userInfo.openId) {
-                    console.log('openId  不存在')
+                    this.$toast({
+                        text: '重新登录',
+                        duration: 2000
+                    })
                     return
                 }
                 const sendData = {
@@ -235,10 +270,44 @@
                     imgList: imgList
                 }
                 console.log(sendData)
-                let res = await api.postDynamic(sendData)
+                return api.postDynamic(sendData)
+            }).then(res => {
                 console.log(res)
-            } catch (err) {
+                this.$toast({
+                    text: '分享成功',
+                    icon_str: 'yes',
+                    duration: 4000
+                })
+                storage.set('refreshData', true)
+                wx.switchTab({
+                    url: '../home/index'
+                })
+            }).catch(err => {
                 console.log(err)
+                this.$toast({
+                    text: '网络出错 ~~',
+                    duration: 2000
+                })
+            })
+        },
+        $toast(obj) {
+            const {text = '', icon_image = '', icon_str= '', duration} =  obj
+            this.setData({
+                $toast: {
+                    show:true,
+                    text: text,
+                    icon_image: icon_image,
+                    icon_str: icon_str
+                }
+            })
+            if (duration) {
+                setTimeout(() => {
+                    this.setData({
+                        $toast: {
+                            show:false
+                        }
+                    })
+                }, duration)
             }
         }
     }
