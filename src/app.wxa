@@ -21,21 +21,21 @@
             },
             tabBar: {
                 color: '#8a8a8a',
-                selectedColor: '#28b1b0',
+                selectedColor: '#d81e06',
                 borderStyle: 'black',
                 backgroundColor: '#ffffff',
                 list: [
                     {
                         pagePath: 'pages/home/index',
-                        iconPath: 'common/assets/tab/coms-normal.png',
-                        selectedIconPath: 'common/assets/tab/coms-active.png',
-                        text: '???'
+                        iconPath: 'common/assets/tab/home_normal.png',
+                        selectedIconPath: 'common/assets/tab/home_active.png',
+                        text: '主页'
                     },
                     {
                         pagePath: 'pages/about/index',
-                        iconPath: 'common/assets/tab/about-normal.png',
-                        selectedIconPath: 'common/assets/tab/about-active.png',
-                        text: '???'
+                        iconPath: 'common/assets/tab/me_normal.png',
+                        selectedIconPath: 'common/assets/tab/me_active.png',
+                        text: '我'
                     }
                 ]
             },

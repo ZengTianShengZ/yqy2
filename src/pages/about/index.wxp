@@ -1,39 +1,43 @@
 <style>
-    .send-dynamic-btn{
-        position: fixed;
-        bottom: 60rpx;
-        left: 60rpx;
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 40rpx;
-        background: #FFFFFF;
-        transition: all .5s ease-in;
+    .f-jc-ac-dc {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
-    .icon-add{
-        width: 80rpx;
-        height: 80rpx;
-    }
-    .imgIconAminDown{
-        transform:translate(0,50px);
-    }
-    .imgIconAminUp{
-        transform:translate(0,-50px);
-    }
+    .page-about{
 
+    }
+    .user-info{
+        background: #afc4dc;
+    }
+    .avatar-img{
+        width: 150rpx;
+        height: 150rpx;
+        margin-top: 60rpx;
+        border-radius: 80rpx;
+        border: 4px solid #ffffff;
+    }
+    .nick-name{
+        font-size: 40rpx;
+        color: #ffffff;
+        margin: 20rpx;
+    }
 </style>
 
 <template>
-     <view class="page-home">
+     <view class="page-about">
+         <view class="user-info f-jc-ac-dc">
+            <image class="avatar-img" src="{{obj_userInfo.avatarUrl}}"></image>
+            <text class="nick-name">{{obj_userInfo.nickName}}</text>
+         </view>
          <list-item
-                wx:for="{{obj_resData.list}}"
-                itemData="{{item}}"
-                wx:key='index'>
-        </list-item>
-        <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
-        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
-        <view bindtap="clickNavigateToSendDyPage" class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
-            <image class="icon-add" src="http://oyn5he3v2.bkt.clouddn.com/icon_add.png"></image>
-        </view>
+                 wx:for="{{obj_resData.list}}"
+                 itemData="{{item}}"
+                 wx:key='index'>
+         </list-item>
+         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
+         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
      </view>
  </template>
 
@@ -53,6 +57,7 @@
             }
         },
         data: {
+            obj_userInfo: {},
             obj_resData:{
                 list:[],
                 pageNum: 0,   //????
@@ -63,23 +68,22 @@
             b_directionYup: true
         },
         onLoad: function (option) {
-            this.onStartPullDownRefresh()
+            app.getTokenInfo().then(r => {
+                this.setData({obj_userInfo: r})
+                this.onStartPullDownRefresh()
+            })
         },
         onShow: function() {
-            const refreshData = storage.get('refreshData')
-            if (refreshData) {
-                storage.set('refreshData', false)
-                this.onStartPullDownRefresh()
-            }
+            this.onStartPullDownRefresh()
         },
         getData(flag) {
-            const location = app.getLocation()
             let {pageNum, pageSize} = this.data.obj_resData
+            const openId = this.data.obj_userInfo.openId
             if (flag === 'moreFlag') {
                 pageNum += 1
             }
-            api.getDynamic({
-                location: `${location.longitude},${location.latitude}`,
+            api.getUserDynamicList({
+                openId,
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
@@ -127,6 +131,7 @@
             wx.startPullDownRefresh()
         },
         onReachBottom() {
+            console.log('.....mmmm....')
             const loadmoreFlag = this.data.loadmoreFlag
             if (loadmoreFlag) {
                 return
@@ -143,25 +148,6 @@
             wx.navigateTo({
                 url: '../sendDynamic/index'
             })
-        },
-        /**
-         * 监听页面滚动
-         * @param obj
-         */
-//        onPageScroll(obj) {
-//            if(obj.scrollTop > scrollOldTo) {
-//                console.log('..1.')
-//                this.setData({
-//                    b_directionYup: true
-//                })
-//            } else {
-//                console.log('..2.')
-//
-//                this.setData({
-//                    b_directionYup: false
-//                })
-//            }
-//            scrollOldTo = obj.scrollTop
-//        },
+        }
     }
 </script>

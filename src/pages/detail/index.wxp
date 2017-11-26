@@ -58,7 +58,7 @@
                     bindtap='clickCommentItem'>
             </comment-item>
             <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
-            <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发条评论" is-end="{{true}}"></wxc-loadmore>
+            <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="没评论啦 ~ 俺也发条评论" is-end="{{true}}"></wxc-loadmore>
         </view>
         <view class="comment-textarea">
             <form class="f-jc-ac" bindsubmit="bindFormSubmit">
@@ -95,7 +95,6 @@
     let scrollOldTo = 0
     export default {
         config: {
-            enablePullDownRefresh: true,
             onReachBottomDistance: 60,
             usingComponents: {
                 "list-item": '../../common/layout/list-item',
