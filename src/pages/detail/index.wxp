@@ -1,28 +1,92 @@
 <style>
-    .comment-item{
+    .f-jc-ac {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+    }
+
+    .comment-item {
         padding: 10rpx;
         box-sizing: border-box;
-        /*background: rgba(234, 234, 234, 0.1);*/
+        margin-bottom: 100rpx;
     }
-    .text-comment{
+
+    .text-comment {
         display: block;
         padding: 6rpx 20rpx;
         background: rgba(160, 160, 160, 0.1);
     }
+
+    .comment-textarea {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        padding: 10rpx 20rpx 5rpx;
+        box-sizing: border-box;
+        background: #ffffff;
+        border-top: 1px solid rgba(159, 159, 159, 0.1);
+    }
+
+    .textarea {
+        display: inline-block;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        margin-right: 10rpx;
+        padding: 20rpx;
+        width: 540rpx;
+    }
+
+    .btn-submit {
+        display: inline-block;
+        width: 100rpx;
+        padding: 0;
+        font-size: 30rpx;
+        color: #343434;
+    }
 </style>
 
 <template>
-     <view class="page-detail">
-         <list-item itemData="{{itemData}}"></list-item>
-         <text class="text-comment">最新评论</text>
-         <view class="comment-item">
-             <comment-item></comment-item>
-             <comment-item></comment-item>
-             <comment-item></comment-item>
-             <comment-item></comment-item>
-         </view>
-     </view>
- </template>
+    <view class="page-detail">
+        <list-item isNavigateTo="false" itemData="{{itemData}}"></list-item>
+        <text class="text-comment">最新评论</text>
+        <view class="comment-item">
+            <comment-item
+                    wx:for="{{obj_commentData.list}}"
+                    itemData="{{item}}"
+                    wx:key='index'
+                    data-commentdata='{{item}}'
+                    bindtap='clickCommentItem'>
+            </comment-item>
+            <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
+            <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发条评论" is-end="{{true}}"></wxc-loadmore>
+        </view>
+        <view class="comment-textarea">
+            <form class="f-jc-ac" bindsubmit="bindFormSubmit">
+                 <textarea class="textarea"
+                           auto-height="true"
+                           auto-focus="{{textarea_auto_focus}}"
+                           fixed="true"
+                           value="{{str_comment_value}}"
+                           show-confirm-bar="false"
+                           placeholder="写评论"
+                           name="textarea"/>
+                <button style="padding:0; margin: 0;border: none" class="btn-submit" form-type="submit">发送</button>
+            </form>
+        </view>
+        <wxc-toast
+                is-show="{{$toast.show}}"
+                text="{{$toast.text}}"
+                icon="{{$toast.icon_str}}"
+                icon-image="{{$toast.icon_image}}">
+        </wxc-toast>
+        <wxc-dialog
+                class="wcx-dialog"
+                content="回复评论"
+                confirm-text="回复"
+                bindconfirm="clickReplyComment">
+        </wxc-dialog>
+    </view>
+</template>
 
 <script>
     const storage = require('../../libs/storage')
@@ -37,31 +101,202 @@
                 "list-item": '../../common/layout/list-item',
                 "comment-item": '../../common/layout/comment-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
-                "wxc-icon": '@minui/wxc-icon'
+                "wxc-toast": '@minui/wxc-toast',
+                "wxc-dialog": '@minui/wxc-dialog'
             }
         },
         data: {
             itemId: '',
-            itemData: {}
+            itemData: {},
+            textarea_auto_focus: false,
+            loadmoreFlag: false,
+            loadmoreIsEndFlag: false,
+            str_comment_value: '',
+            obj_commentData: {
+                list: [],
+                pageNum: 0,   //????
+                pageSize: 10   //????
+            },
+            obj_replyTo: {},
+            $toast: {
+                show: false,
+                text: '正在上传 ~~',
+                iconShow: true,
+                icon_image: '',
+                duration: '',
+                icon_str: ''  // 'yes', ''
+            },
+            icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad: function (option) {
             this.setData({
                 itemId: option.itemId
             })
             this.getData()
+            this.getCommentData()
         },
-        onShow: function() {
+        onShow: function () {
         },
+        /**
+         * 获取 Dynamic
+         **/
         getData() {
-            wx.showLoading({title:"加载..."})
+            wx.showLoading({title: "加载..."})
             const id = this.data.itemId
             api.getDetailDynamic({id}).then(res => {
-                this.setData({itemData:res.data})
+                this.setData({itemData: res.data})
             }).catch(err => {
                 console.log(err)
             }).then(() => {
                 wx.hideLoading()
             })
         },
+        /**
+         * 获取评论
+         **/
+        getCommentData(flag) {
+            const itemId = this.data.itemId
+            let {pageNum, pageSize} = this.data.obj_commentData
+            if (flag === 'moreFlag') {
+                pageNum += 1
+            }
+            api.getConditionComment({
+                dynamicId: itemId,
+                pageNum: pageNum,
+                pageSize: pageSize
+            }).then(res => {
+                console.log(res)
+                if (res.success) {
+                    let listData = [...this.data.obj_commentData.list, ...res.data.list]
+                    this.setData({
+                        obj_commentData:{
+                            list: listData,
+                            pageNum: res.data.pageNum,
+                            pageSize: res.data.pageSize,
+                            totalPageNum: res.data.totalPageNum
+                        }
+                    })
+                }
+            }).catch(err => {
+                console.log(err)
+            }).then(() => {
+                this.setData({loadmoreFlag: false})
+            })
+        },
+        /**
+         * 上啦加载更多
+         **/
+        onReachBottom() {
+            const loadmoreFlag = this.data.loadmoreFlag
+            if (loadmoreFlag) {
+                return
+            }
+            const {pageNum, totalPageNum} = this.data.obj_commentData
+            if (pageNum >= (totalPageNum - 1)) {
+                this.setData({loadmoreIsEndFlag: true})
+                return
+            }
+            this.setData({loadmoreFlag: true})
+            this.getCommentData('moreFlag')
+        },
+        /**
+         * 发表评论
+         * @param e
+         */
+        bindFormSubmit: function (e) {
+            const comment = e.detail.value.textarea
+            if (!comment) {
+                this.$toast({
+                    text: '评论为空 ~~',
+                    duration: 2000
+                })
+                return
+            }
+            const dynamicId = this.data.itemId
+            app.getTokenInfo().then(r => {
+                console.log(r)
+                const {openId, nickName, avatarUrl} = r
+                const replyToNickName = comment.substring(1,comment.indexOf(':'))
+                let replyTo = {}
+                if (replyToNickName && replyToNickName === this.data.obj_replyTo.nickName) {
+                    console.log(replyToNickName)
+                    replyTo.nickName = replyToNickName
+                    replyTo.comment = this.data.obj_replyTo.comment
+                }
+                api.sumitCommont({
+                    openId,
+                    nickName,
+                    avatarUrl,
+                    dynamicId,
+                    comment,
+                    replyTo
+                }).then(r => {
+                    console.log(r)
+                    if (r.success) {
+                        this.$toast({
+                            text: '评论成功 ~~',
+                            duration: 2000
+                        })
+                        // 更新评论列表数据
+                        let oldList = this.data.obj_commentData.list
+                        oldList.unshift(r.data)
+                        this.setData({obj_commentData: {
+                            list: oldList
+                        }})
+                        this.setData({str_comment_value: ''})
+                    }
+                }).catch(err => {
+                    console.log(err)
+                    this.$toast({
+                        text: '评论出错啦 ~~ 请检查网络',
+                        duration: 2000
+                    })
+                })
+            })
+        },
+        clickCommentItem(event) {
+            const commentdata = event.currentTarget.dataset.commentdata
+            this.setData({
+                obj_replyTo: {
+                    nickName: commentdata.nickName,
+                    comment: commentdata.comment
+                }
+            })
+            this.showDialog()
+        },
+        clickReplyComment(event) {
+            const nickName = this.data.obj_replyTo.nickName
+            this.setData({textarea_auto_focus: true})
+            this.setData({str_comment_value: `@${nickName}:`})
+            this.hideDialog()
+        },
+        showDialog() {
+            const dialogComponent = this.selectComponent('.wcx-dialog')
+            dialogComponent && dialogComponent.show()
+        },
+        hideDialog() {
+            const dialogComponent = this.selectComponent('.wcx-dialog')
+            dialogComponent && dialogComponent.hide()
+        },
+        $toast(obj) {
+            const {text = '', icon_image = '', icon_str = '', duration} = obj
+            this.setData({
+                $toast: {
+                    show: true,
+                    text: text,
+                    icon_image: icon_image,
+                    icon_str: icon_str
+                }
+            })
+            if (duration) {
+                setTimeout(() => {
+                    this.setData({
+                        $toast: {
+                            show: false
+                        }
+                    })
+                }, duration)
+            }
+        }
     }
 </script>

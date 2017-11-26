@@ -84,6 +84,10 @@
             }
         },
         properties: {
+            isNavigateTo: {
+                type: String,
+                value: ''
+            },
             itemData: {
                 type: Object,
                 value: {
@@ -117,6 +121,8 @@
                 })
             },
             clickNavigateToDetailPage(event) {
+                const isNavigateTo = this.data.isNavigateTo
+                if (isNavigateTo === 'false') return
                 const itemId = event.currentTarget.dataset.itemid
                 wx.navigateTo({
                     url: '../detail/index?itemId=' + itemId

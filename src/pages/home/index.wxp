@@ -97,7 +97,7 @@
                         pageSize: res.data.pageSize,
                         totalPageNum: res.data.totalPageNum
                     }
-                });
+                })
             }).catch(err => {
                 console.log(err)
             }).then(() => {
