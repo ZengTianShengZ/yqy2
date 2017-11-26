@@ -1,0 +1,85 @@
+<style>
+    @import '../../common/assets/style/layout.wxss';
+    .comment-item{
+        padding-top: 20rpx;
+    }
+    .avatarUrl{
+        display: block;
+        width: 100rpx;
+        height: 90rpx;
+        border-radius: 50rpx;
+    }
+    .top-right{
+        width: 100%;
+        margin-left: 20rpx;
+        border-bottom: 1px solid rgba(99, 99, 99, 0.1);
+    }
+    .top-name{
+        font-size: 34rpx;
+    }
+    .top-time{
+        font-size: 26rpx;
+        color: #989898;
+    }
+    .top-address{
+        margin-right: 10rpx;
+    }
+    .content{
+        margin: 10rpx 0;
+        font-size: 34rpx;
+        color: #343434;
+    }
+    .reply-to{
+        padding: 20rpx;
+        background: rgba(197, 197, 197, 0.1);
+    }
+    .reply-to-text{
+        color: #5390b1;
+    }
+</style>
+<template>
+    <view class="comment-item f-js-as">
+        <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
+        <view class="top-right">
+            <view class="'top-name">{{itemData.nickName}}</view>
+            <text class="top-time">{{itemData.time}}</text>
+            <view class="content">
+                <text wx-if="{{itemData.replyTo.nickName}}" class="reply-to-text">回复 @{{itemData.replyTo.nickName}}：</text>
+                {{itemData.comment}}
+            </view>
+            <view class="reply-to" wx-if="{{itemData.replyTo.nickName}}">
+                <text class="reply-to-text">@{{itemData.replyTo.nickName}}：</text>{{itemData.replyTo.comment}}
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+
+    export default {
+        config: {
+            usingComponents: {
+            }
+        },
+        properties: {
+            itemData: {
+                type: Object,
+                value: {
+                    openId: '',
+                    dynamicId: '2222',
+                    nickName: '曾田生',
+                    time: "今天 12:16",
+                    avatarUrl: 'http://oyn5he3v2.bkt.clouddn.com/defaultAvatar.png',
+                    comment: '评论，评论，评论，评论，评论，评论，',
+                    replyTo: {
+                        nickName: 'klkl',
+                        comment: '回复，回复，回复，回复，回复，'
+                    }
+                }
+            }
+        },
+        methods: {
+
+        }
+    }
+</script>

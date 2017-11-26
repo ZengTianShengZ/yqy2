@@ -46,7 +46,7 @@
     }
 </style>
 <template>
-    <view class="list-item">
+    <view class="list-item" data-itemId='{{itemData._id}}' bindtap='clickNavigateToDetailPage'>
         <view class="top f-js-ac">
             <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
             <view class="top-right">
@@ -66,6 +66,7 @@
                    wx:for="{{itemData.imgList}}"
                    src="{{item}}"
                    wx:key='index'
+                   wx:if="{{item}}"
                    data-imgUrl='{{item}}'
                    data-imgUrls='{{itemData.imgList}}'
                    bindtap='clickPreviewImage'>
@@ -113,6 +114,12 @@
                     urls: event.currentTarget.dataset.imgurls,
                     success: function (res) {
                     }
+                })
+            },
+            clickNavigateToDetailPage(event) {
+                const itemId = event.currentTarget.dataset.itemid
+                wx.navigateTo({
+                    url: '../detail/index?itemId=' + itemId
                 })
             },
         }

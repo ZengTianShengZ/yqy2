@@ -1,0 +1,67 @@
+<style>
+    .comment-item{
+        padding: 10rpx;
+        box-sizing: border-box;
+        /*background: rgba(234, 234, 234, 0.1);*/
+    }
+    .text-comment{
+        display: block;
+        padding: 6rpx 20rpx;
+        background: rgba(160, 160, 160, 0.1);
+    }
+</style>
+
+<template>
+     <view class="page-detail">
+         <list-item itemData="{{itemData}}"></list-item>
+         <text class="text-comment">最新评论</text>
+         <view class="comment-item">
+             <comment-item></comment-item>
+             <comment-item></comment-item>
+             <comment-item></comment-item>
+             <comment-item></comment-item>
+         </view>
+     </view>
+ </template>
+
+<script>
+    const storage = require('../../libs/storage')
+    const api = require('../../api/index.js')
+    const app = getApp()
+    let scrollOldTo = 0
+    export default {
+        config: {
+            enablePullDownRefresh: true,
+            onReachBottomDistance: 60,
+            usingComponents: {
+                "list-item": '../../common/layout/list-item',
+                "comment-item": '../../common/layout/comment-item',
+                "wxc-loadmore": '@minui/wxc-loadmore',
+                "wxc-icon": '@minui/wxc-icon'
+            }
+        },
+        data: {
+            itemId: '',
+            itemData: {}
+        },
+        onLoad: function (option) {
+            this.setData({
+                itemId: option.itemId
+            })
+            this.getData()
+        },
+        onShow: function() {
+        },
+        getData() {
+            wx.showLoading({title:"加载..."})
+            const id = this.data.itemId
+            api.getDetailDynamic({id}).then(res => {
+                this.setData({itemData:res.data})
+            }).catch(err => {
+                console.log(err)
+            }).then(() => {
+                wx.hideLoading()
+            })
+        },
+    }
+</script>

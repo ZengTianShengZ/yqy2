@@ -12,6 +12,7 @@
     .icon-add{
         width: 80rpx;
         height: 80rpx;
+        background: red;
     }
     .imgIconAminDown{
         transform:translate(0,50px);
@@ -63,7 +64,7 @@
             b_directionYup: true
         },
         onLoad: function (option) {
-            this.getData()
+            this.onStartPullDownRefresh()
         },
         onShow: function() {
             const refreshData = storage.get('refreshData')
@@ -73,7 +74,6 @@
             }
         },
         getData(flag) {
-            wx.showLoading({title:"加载..."})
             const location = app.getLocation()
             let {pageNum, pageSize} = this.data.obj_resData
             if (flag === 'moreFlag') {
@@ -84,9 +84,15 @@
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
+                let listData = []
+                if (flag === 'refreshFlag') {
+                    listData = res.data.list
+                } else {
+                    listData = [...this.data.obj_resData.list, ...res.data.list]
+                }
                 this.setData({
                     obj_resData:{
-                        list: [...this.data.obj_resData.list, ...res.data.list],
+                        list: listData,
                         pageNum: res.data.pageNum,
                         pageSize: res.data.pageSize,
                         totalPageNum: res.data.totalPageNum
@@ -95,7 +101,6 @@
             }).catch(err => {
                 console.log(err)
             }).then(() => {
-                wx.hideLoading()
                 wx.stopPullDownRefresh()
                 this.setData({loadmoreFlag: false})
             })
@@ -104,12 +109,11 @@
             this.setData({loadmoreIsEndFlag: false})
             this.setData({
                 obj_resData: {
-                    list: [],
                     pageNum: 0,
                     pageSize: 10
                 }
             })
-            this.getData()
+            this.getData('refreshFlag')
         },
         /**
          * 下拉触发刷新
@@ -122,7 +126,6 @@
          **/
         onStartPullDownRefresh() {
             wx.startPullDownRefresh()
-            this.refreshData()
         },
         onReachBottom() {
             const loadmoreFlag = this.data.loadmoreFlag
