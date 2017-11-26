@@ -4,11 +4,16 @@
         justify-content: flex-end;
         align-items: flex-end;
     }
-
+    .comment-none{
+        text-align: center;
+        font-size: 34rpx;
+        color: #343434;
+        padding: 30rpx 0;
+    }
     .comment-item {
         padding: 10rpx;
         box-sizing: border-box;
-        margin-bottom: 100rpx;
+        margin-bottom: 120rpx;
     }
 
     .text-comment {
@@ -60,6 +65,7 @@
             <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
             <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="没评论啦 ~ 俺也发条评论" is-end="{{true}}"></wxc-loadmore>
         </view>
+        <view class="comment-none" wx:if="{{obj_commentData.list <= 0}}">暂无评论，欢迎抢沙发</view>
         <view class="comment-textarea">
             <form class="f-jc-ac" bindsubmit="bindFormSubmit">
                  <textarea class="textarea"
@@ -237,10 +243,12 @@
                             duration: 2000
                         })
                         // 更新评论列表数据
-                        let oldList = this.data.obj_commentData.list
-                        oldList.unshift(r.data)
+                        let {list, pageNum, totalPageNum} = this.data.obj_commentData
+                        list.unshift(r.data)
                         this.setData({obj_commentData: {
-                            list: oldList
+                            list,
+                            pageNum,
+                            totalPageNum
                         }})
                         this.setData({str_comment_value: ''})
                     }

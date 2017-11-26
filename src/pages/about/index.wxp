@@ -23,6 +23,12 @@
         color: #ffffff;
         margin: 20rpx;
     }
+    .res-data-none{
+        text-align: center;
+        font-size: 34rpx;
+        color: #343434;
+        padding: 50rpx 0;
+    }
 </style>
 
 <template>
@@ -38,6 +44,7 @@
          </list-item>
          <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
          <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
+         <view class="res-data-none" wx:if="{{obj_resData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
      </view>
  </template>
 
