@@ -2,6 +2,9 @@
     @import '../../common/assets/style/layout.wxss';
 
     .list-item{
+        position: relative;
+        top:0;
+        left: 0;
         padding:0 20rpx 20rpx;
         box-sizing: border-box;
     }
@@ -21,6 +24,11 @@
     }
     .top-name{
         font-size: 36rpx;
+    }
+    .more-btn{
+        width: 36rpx;
+        height: 36rpx;
+        color: #888888;
     }
     .top-time{
         font-size: 28rpx;
@@ -44,13 +52,47 @@
         padding: 3rpx;
         box-sizing: border-box;
     }
+    .more-dialog{
+        position: absolute;
+        top:0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.08);
+        border-top: 1px solid rgba(0,0,0,0.2);
+        transition: all 0.6s cubic-bezier(.36,.98,.3,.91);
+        transform:translate3d(100%,0,0);
+    }
+    .more_dialog_anim_in{
+        transform:translate3d(0,0,0);
+    }
+    .more_dialog_anim_out{
+        transform:translate3d(100%,0,0);
+    }
+    .md-delete-content{
+        position: relative;
+        top:0;
+        left: 0;
+        width: 200rpx;
+        height: 100%;
+        background: #FFFFFF;
+    }
+    .share-btn{
+        margin-bottom: 20rpx;
+    }
 </style>
 <template>
     <view class="list-item" data-itemId='{{itemData._id}}' bindtap='clickNavigateToDetailPage'>
         <view class="top f-js-ac">
             <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
             <view class="top-right">
-                <view class="'top-name">{{itemData.nickName}}</view>
+                <view class="'top-name">
+                    <text>{{itemData.nickName}}</text>
+                    <image catchtap='clickMoreBtn'
+                           wx:if="{{moreBtnFlag}}"
+                           class="more-btn fr"
+                           src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/iconMore%202.png"></image>
+                </view>
                 <view class="top-time">
                     <text>{{itemData.time}}</text>
                     <wxc-icon class="fr" size="26" type="location"></wxc-icon>
@@ -73,10 +115,22 @@
                    catchtap='clickPreviewImage'>
             </image>
         </view>
+        <view class="more-dialog {{moreDialogShowFlag?'more_dialog_anim_in':'more_dialog_anim_out'}}"
+              catchtap='clickCloseMoreBtn'>
+            <view class="md-delete-content fr">
+                <view class="ctt">
+                    <view class="delete-btn"
+                          data-itemId='{{itemData._id}}'
+                          catchtap='clickDeleteBtn'>删除</view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
 <script>
+    const app = getApp()
+    const api = require('../../api/index.js')
 
     export default {
         config: {
@@ -85,6 +139,10 @@
             }
         },
         properties: {
+            moreBtnFlag: {
+                type: Boolean,
+                value: false
+            },
             isNavigateTo: {
                 type: String,
                 value: ''
@@ -112,6 +170,9 @@
                 }
             }
         },
+        data: {
+            moreDialogShowFlag: false
+        },
         methods: {
             clickPreviewImage(event) {
                 wx.previewImage({
@@ -129,6 +190,26 @@
                     url: '../detail/index?itemId=' + itemId
                 })
             },
+            clickMoreBtn() {
+                this.setData({moreDialogShowFlag: true})
+            },
+            clickCloseMoreBtn() {
+                this.setData({moreDialogShowFlag: false})
+            },
+            clickDeleteBtn(event) {
+                const itemId = event.currentTarget.dataset.itemid
+                app.getTokenInfo().then(r => {
+                    const {openId} = r
+                    api.deleteUserDynamic({
+                        openId,
+                        id: itemId
+                    }).then(res => {
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                })
+            }
         }
     }
 </script>

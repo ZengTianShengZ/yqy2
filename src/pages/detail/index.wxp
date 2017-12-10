@@ -222,7 +222,6 @@
             }
             const dynamicId = this.data.itemId
             app.getTokenInfo().then(r => {
-                console.log(r)
                 const {openId, nickName, avatarUrl} = r
                 const replyToNickName = comment.substring(1,comment.indexOf(':'))
                 let replyTo = {}

@@ -40,6 +40,7 @@
          <list-item
                  wx:for="{{obj_resData.list}}"
                  itemData="{{item}}"
+                 moreBtnFlag="{{true}}"
                  wx:key='index'>
          </list-item>
          <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
@@ -138,7 +139,6 @@
             wx.startPullDownRefresh()
         },
         onReachBottom() {
-            console.log('.....mmmm....')
             const loadmoreFlag = this.data.loadmoreFlag
             if (loadmoreFlag) {
                 return
