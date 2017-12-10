@@ -40,7 +40,7 @@
     }
     .img-item{
         width: 33.33%;
-        height: 220rpx;
+        height: 225rpx;
         padding: 3rpx;
         box-sizing: border-box;
     }
@@ -63,13 +63,14 @@
         </view>
         <view class="img-content">
             <image class="img-item"
+                   mode="aspectFill"
                    wx:for="{{itemData.imgList}}"
                    src="{{item}}"
                    wx:key='index'
                    wx:if="{{item}}"
                    data-imgUrl='{{item}}'
                    data-imgUrls='{{itemData.imgList}}'
-                   bindtap='clickPreviewImage'>
+                   catchtap='clickPreviewImage'>
             </image>
         </view>
     </view>

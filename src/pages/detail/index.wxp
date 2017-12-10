@@ -73,7 +73,7 @@
                            auto-focus="{{textarea_auto_focus}}"
                            fixed="true"
                            value="{{str_comment_value}}"
-                           show-confirm-bar="false"
+                           show-confirm-bar=''
                            placeholder="写评论"
                            name="textarea"/>
                 <button style="padding:0; margin: 0;border: none" class="btn-submit" form-type="submit">发送</button>
@@ -134,6 +134,9 @@
             icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad: function (option) {
+            wx.showShareMenu({
+                withShareTicket: true
+            })
             this.setData({
                 itemId: option.itemId
             })

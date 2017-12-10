@@ -27,14 +27,14 @@
                 list: [
                     {
                         pagePath: 'pages/home/index',
-                        iconPath: 'common/assets/tab/home_normal.png',
-                        selectedIconPath: 'common/assets/tab/home_active.png',
+                        iconPath: 'common/assets/tab/home_nor.png',
+                        selectedIconPath: 'common/assets/tab/home_act.png',
                         text: '主页'
                     },
                     {
                         pagePath: 'pages/about/index',
-                        iconPath: 'common/assets/tab/me_normal.png',
-                        selectedIconPath: 'common/assets/tab/me_active.png',
+                        iconPath: 'common/assets/tab/me_nor.png',
+                        selectedIconPath: 'common/assets/tab/me_act.png',
                         text: '我'
                     }
                 ]

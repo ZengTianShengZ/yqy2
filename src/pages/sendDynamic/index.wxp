@@ -31,6 +31,7 @@
         z-index: 1;
         width: 45rpx;
         height: 45rpx;
+        background: #FFFFFF;
     }
     .choose-image .image-item{
         width: 160rpx;
@@ -72,19 +73,22 @@
     <view class="section">
         <form bindsubmit="bindFormSubmit">
             <view>
-                <textarea class='textarea-text'  name="textarea" placeholder="一起吖~" />
+                <textarea class='textarea-text'
+                          show-confirm-bar=''
+                          name="textarea"
+                          placeholder="一起吖~" />
             </view>
             <view class='choose-image'>
                 <block class="image-list" wx:if='{{imgTempFilePaths.length > 0}}'>
                     <view class="choose-block" wx:for='{{imgTempFilePaths}}' wx:key='index'>
-                        <image class="close-image-btn" data-closeImgIndex='{{index}}' bindtap="closeImgBtnClick" src="../../images/icon/iconClose.png"></image>
+                        <image class="close-image-btn" data-closeImgIndex='{{index}}' bindtap="closeImgBtnClick" src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/iconClose.png"></image>
                         <image class="image-item" src="{{item}}"></image>
                     </view>
                 </block>
-                <image class="choose-image-btn" wx:if='{{imgTempFilePaths.length < 9}}' bindtap="chooseImgBtnClick" src="../../images/icon/iconAddImg.png"></image>
+                <image class="choose-image-btn" wx:if='{{imgTempFilePaths.length < 9}}' bindtap="chooseImgBtnClick" src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/iconAddImg.png"></image>
             </view>
             <view class='icon-address' bindtap="chooseLocationBtnClick" >
-                <image class="img-icon" src="../../images/icon/iconAddress.png"></image>
+                <image class="img-icon" src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/iconAddress.png"></image>
                 <text class="text-ng">{{str_address}}</text>
             </view>
             <view class='send-btn-box'>
@@ -109,8 +113,6 @@
 
     export default {
         config: {
-            enablePullDownRefresh: true,
-            onReachBottomDistance: 60,
             usingComponents: {
                 "wxc-toast":'@minui/wxc-toast'
             }
@@ -212,7 +214,14 @@
 
             if (!description && imgUrlList.length <=0) {
                 this.$toast({
-                    text: '请分享文字和图片',
+                    text: '请分享内容或图片',
+                    duration: 2000
+                })
+                return
+            }
+            if (description.length > 120) {
+                this.$toast({
+                    text: '分享内容不得超过120个字',
                     duration: 2000
                 })
                 return

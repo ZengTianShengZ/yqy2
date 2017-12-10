@@ -32,7 +32,7 @@
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
         <view bindtap="clickNavigateToSendDyPage" class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
-            <image class="icon-add" src="http://oyn5he3v2.bkt.clouddn.com/icon_add.png"></image>
+            <image class="icon-add" src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222113/iconAdd.png"></image>
         </view>
      </view>
  </template>

@@ -6,7 +6,7 @@
     .avatarUrl{
         display: block;
         width: 100rpx;
-        height: 90rpx;
+        height: 86rpx;
         border-radius: 50rpx;
     }
     .top-right{
