@@ -34,6 +34,10 @@
         <view bindtap="clickNavigateToSendDyPage" class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
             <image class="icon-add" src="http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222113/iconAdd.png"></image>
         </view>
+        <abnor  bind:abnortap='clickReloadBtn'
+                wx:if='{{abnorShowFlag}}'
+                image='http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/abnor_img.png'
+                title='网络加载失败，点击刷新'></abnor>
      </view>
  </template>
 
@@ -48,6 +52,7 @@
             onReachBottomDistance: 60,
             usingComponents: {
                 "list-item": '../../common/layout/list-item',
+                "abnor": '../../common/layout/abnor',
                 "wxc-loadmore": '@minui/wxc-loadmore',
                 "wxc-icon": '@minui/wxc-icon'
             }
@@ -60,7 +65,8 @@
             },
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
-            b_directionYup: true
+            b_directionYup: true,
+            abnorShowFlag:false
         },
         onLoad: function (option) {
             this.onStartPullDownRefresh()
@@ -98,6 +104,9 @@
                     }
                 })
             }).catch(err => {
+                if (this.data.obj_resData.list.length === 0) {
+                     abnorShowFlag: true
+                }
                 console.log(err)
             }).then(() => {
                 wx.stopPullDownRefresh()
@@ -143,6 +152,9 @@
             wx.navigateTo({
                 url: '../sendDynamic/index'
             })
+        },
+        clickReloadBtn() {
+            this.getData('refreshFlag')
         },
         /**
          * 监听页面滚动

@@ -131,6 +131,7 @@
 <script>
     const app = getApp()
     const api = require('../../api/index.js')
+    const storage = require('../../libs/storage')
 
     export default {
         config: {
@@ -204,7 +205,10 @@
                         openId,
                         id: itemId
                     }).then(res => {
-                        console.log(res)
+                        if (res.success) {
+                            storage.set('refreshData', true)
+                            wx.startPullDownRefresh()
+                        }
                     }).catch(err => {
                         console.log(err)
                     })
