@@ -7,6 +7,7 @@
         left: 0;
         padding:0 20rpx 20rpx;
         box-sizing: border-box;
+        overflow-x: hidden;
     }
     .top{
         padding-top: 20rpx;

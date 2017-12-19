@@ -101,6 +101,7 @@
     let scrollOldTo = 0
     export default {
         config: {
+            navigationBarTitleText: '动态',
             onReachBottomDistance: 60,
             usingComponents: {
                 "list-item": '../../common/layout/list-item',

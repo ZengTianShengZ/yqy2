@@ -16,7 +16,7 @@
                 backgroundTextStyle: 'dark',
                 backgroundColor: '#efefef',
                 navigationBarBackgroundColor: '#ffffff',
-                navigationBarTitleText: 'MinUI',
+                navigationBarTitleText: '方圆两公里',
                 navigationBarTextStyle: 'black'
             },
             tabBar: {

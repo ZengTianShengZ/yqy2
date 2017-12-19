@@ -114,6 +114,7 @@
 
     export default {
         config: {
+            navigationBarTitleText: '发动态',
             usingComponents: {
                 "wxc-toast":'@minui/wxc-toast'
             }

@@ -104,9 +104,9 @@
                     }
                 })
             }).catch(err => {
-                if (this.data.obj_resData.list.length === 0) {
-                     abnorShowFlag: true
-                }
+//                if (!this.data.obj_resData.list || this.data.obj_resData.list.length === 0) {
+//                    this.setData({abnorShowFlag: true})
+//                }
                 console.log(err)
             }).then(() => {
                 wx.stopPullDownRefresh()

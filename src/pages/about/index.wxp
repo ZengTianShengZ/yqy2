@@ -56,6 +56,7 @@
     let scrollOldTo = 0
     export default {
         config: {
+            navigationBarTitleText: '我的',
             enablePullDownRefresh: true,
             onReachBottomDistance: 60,
             usingComponents: {
