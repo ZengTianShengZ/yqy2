@@ -34,18 +34,18 @@
 <template>
      <view class="page-about">
          <view class="user-info f-jc-ac-dc">
-            <image class="avatar-img" src="{{obj_userInfo.avatarUrl}}"></image>
-            <text class="nick-name">{{obj_userInfo.nickName}}</text>
+            <image class="avatar-img" src="{{oUserInfo.avatarUrl}}"></image>
+            <text class="nick-name">{{oUserInfo.nickName}}</text>
          </view>
          <list-item
-                 wx:for="{{obj_resData.list}}"
+                 wx:for="{{oResData.list}}"
                  itemData="{{item}}"
                  moreBtnFlag="{{true}}"
                  wx:key='index'>
          </list-item>
          <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
          <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
-         <view class="res-data-none" wx:if="{{obj_resData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
+         <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
      </view>
  </template>
 
@@ -66,8 +66,8 @@
             }
         },
         data: {
-            obj_userInfo: {},
-            obj_resData:{
+            oUserInfo: {},
+            oResData:{
                 list:[],
                 pageNum: 0,   //????
                 pageSize: 10   //????
@@ -78,16 +78,21 @@
         },
         onLoad: function (option) {
             app.getTokenInfo().then(r => {
-                this.setData({obj_userInfo: r})
+                console.log('用户拒绝授权')
+                this.setData({oUserInfo: r})
                 this.onStartPullDownRefresh()
+            }, err => {
+                console.log('用户拒绝授权1')
+            }).catch(err => {
+                console.log('用户拒绝授权')
             })
         },
         onShow: function() {
             this.onStartPullDownRefresh()
         },
         getData(flag) {
-            let {pageNum, pageSize} = this.data.obj_resData
-            const openId = this.data.obj_userInfo.openId
+            let {pageNum, pageSize} = this.data.oResData
+            const openId = this.data.oUserInfo.openId
             if (flag === 'moreFlag') {
                 pageNum += 1
             }
@@ -100,10 +105,10 @@
                 if (flag === 'refreshFlag') {
                     listData = res.data.list
                 } else {
-                    listData = [...this.data.obj_resData.list, ...res.data.list]
+                    listData = [...this.data.oResData.list, ...res.data.list]
                 }
                 this.setData({
-                    obj_resData:{
+                    oResData:{
                         list: listData,
                         pageNum: res.data.pageNum,
                         pageSize: res.data.pageSize,
@@ -120,7 +125,7 @@
         refreshData() {
             this.setData({loadmoreIsEndFlag: false})
             this.setData({
-                obj_resData: {
+                oResData: {
                     pageNum: 0,
                     pageSize: 10
                 }
@@ -144,7 +149,7 @@
             if (loadmoreFlag) {
                 return
             }
-            const {pageNum, totalPageNum} = this.data.obj_resData
+            const {pageNum, totalPageNum} = this.data.oResData
             if (pageNum >= (totalPageNum - 1)) {
                 this.setData({loadmoreIsEndFlag: true})
                 return

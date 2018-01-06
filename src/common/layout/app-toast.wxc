@@ -1,0 +1,59 @@
+<style>
+</style>
+<template>
+    <wxc-toast
+            is-show="{{toastMsg.show}}"
+            text="{{toastMsg.text}}"
+            icon="{{toastMsg.icon_str}}"
+            icon-image="{{toastMsg.icon_image}}">
+    </wxc-toast>
+</template>
+
+<script>
+    export default {
+        config: {
+            usingComponents: {
+                "wxc-toast": '@minui/wxc-toast'
+            }
+        },
+        properties: {
+            toastMsg: {
+                type: Object,
+                value: {
+                    show: false,
+                    text: '正在上传 ~~',
+                    iconShow: true,
+                    icon_image: '',
+                    duration: '',
+                    icon_str: '',  // 'yes', ''
+                }
+            },
+            iconImage: {
+                type: String,
+                value: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
+            }
+        },
+        methods: {
+            toastMsg(obj) {
+                const {text = '', icon_image = '', icon_str = '', duration} = obj
+                this.setData({
+                    toastMsg: {
+                        show: true,
+                        text: text,
+                        icon_image: icon_image,
+                        icon_str: icon_str
+                    }
+                })
+                if (duration) {
+                    setTimeout(() => {
+                        this.setData({
+                            toastMsg: {
+                                show: false
+                            }
+                        })
+                    }, duration)
+                }
+            }
+        }
+    }
+</script>

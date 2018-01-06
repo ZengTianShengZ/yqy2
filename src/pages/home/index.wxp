@@ -37,7 +37,10 @@
         <abnor  bind:abnortap='clickReloadBtn'
                 wx:if='{{abnorShowFlag}}'
                 image='http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222114/abnor_img.png'
-                title='网络加载失败，点击刷新'></abnor>
+                title='网络加载失败，点击刷新'>
+
+        </abnor>
+         <app-toast id='appToast' toastMsg="{{$toast}}"></app-toast>
      </view>
  </template>
 
@@ -52,6 +55,7 @@
             onReachBottomDistance: 60,
             usingComponents: {
                 "list-item": '../../common/layout/list-item',
+                "app-toast": '../../common/layout/app-toast',
                 "abnor": '../../common/layout/abnor',
                 "wxc-loadmore": '@minui/wxc-loadmore',
                 "wxc-icon": '@minui/wxc-icon'
@@ -61,15 +65,26 @@
             obj_resData:{
                 list:[],
                 pageNum: 0,   //????
-                pageSize: 10   //????
+                pageSize: 20   //????
             },
+            $toast: {},
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
             b_directionYup: true,
             abnorShowFlag:false
         },
         onLoad: function (option) {
-            this.onStartPullDownRefresh()
+            const _this = this
+            this.appToast = this.selectComponent("#appToast")
+            app.getLocation(function (toastMsg) {
+                _this.onStartPullDownRefresh()
+                if(toastMsg) {
+                    _this.appToast.toastMsg({
+                        text: toastMsg,
+                        duration: 4000
+                    })
+                }
+            })
         },
         onShow: function() {
             const refreshData = storage.get('refreshData')
