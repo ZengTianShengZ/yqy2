@@ -5,49 +5,60 @@
         align-items: center;
         flex-direction: column;
     }
-    .page-about{
+
+    .page-about {
 
     }
-    .user-info{
+
+    .user-info {
         background: #afc4dc;
     }
-    .avatar-img{
-        width: 150rpx;
-        height: 150rpx;
-        margin-top: 60rpx;
-        border-radius: 80rpx;
+
+    .avatar-img {
+        width: 150 rpx;
+        height: 150 rpx;
+        margin-top: 60 rpx;
+        border-radius: 80 rpx;
         border: 4px solid #ffffff;
     }
-    .nick-name{
-        font-size: 40rpx;
+
+    .nick-name {
+        font-size: 40 rpx;
         color: #ffffff;
-        margin: 20rpx;
+        margin: 20 rpx;
     }
-    .res-data-none{
+
+    .res-data-none {
         text-align: center;
-        font-size: 34rpx;
+        font-size: 34 rpx;
         color: #343434;
-        padding: 50rpx 0;
+        padding: 50 rpx 0;
     }
 </style>
 
 <template>
-     <view class="page-about">
-         <view class="user-info f-jc-ac-dc">
+    <view class="page-about">
+        <view class="user-info f-jc-ac-dc">
             <image class="avatar-img" src="{{oUserInfo.avatarUrl}}"></image>
             <text class="nick-name">{{oUserInfo.nickName}}</text>
-         </view>
-         <list-item
-                 wx:for="{{oResData.list}}"
-                 itemData="{{item}}"
-                 moreBtnFlag="{{true}}"
-                 wx:key='index'>
-         </list-item>
-         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
-         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
-         <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
-     </view>
- </template>
+        </view>
+        <list-item
+                wx:for="{{oResData.list}}"
+                itemData="{{item}}"
+                moreBtnFlag="{{true}}"
+                wx:key='index'>
+        </list-item>
+        <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
+        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
+        <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
+        <wxc-dialog
+                class="wcx-dialog"
+                content="需要用户授权才可进一步操作"
+                confirm-text="确定"
+                bindconfirm="dialogConfirmClick">
+        </wxc-dialog>
+    </view>
+</template>
 
 <script>
     const storage = require('../../libs/storage')
@@ -62,13 +73,14 @@
             usingComponents: {
                 "list-item": '../../common/layout/list-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
-                "wxc-icon": '@minui/wxc-icon'
+                "wxc-icon": '@minui/wxc-icon',
+                "wxc-dialog": '@minui/wxc-dialog'
             }
         },
         data: {
             oUserInfo: {},
-            oResData:{
-                list:[],
+            oResData: {
+                list: [],
                 pageNum: 0,   //????
                 pageSize: 10   //????
             },
@@ -77,17 +89,20 @@
             b_directionYup: true
         },
         onLoad: function (option) {
+
+        },
+        initData() {
             app.getTokenInfo().then(r => {
-                console.log('用户拒绝授权')
+                console.log(r)
                 this.setData({oUserInfo: r})
                 this.onStartPullDownRefresh()
             }, err => {
-                console.log('用户拒绝授权1')
-            }).catch(err => {
+                app.showDialog(this)
                 console.log('用户拒绝授权')
             })
         },
-        onShow: function() {
+        onShow: function () {
+            this.initData()
             this.onStartPullDownRefresh()
         },
         getData(flag) {
@@ -108,7 +123,7 @@
                     listData = [...this.data.oResData.list, ...res.data.list]
                 }
                 this.setData({
-                    oResData:{
+                    oResData: {
                         list: listData,
                         pageNum: res.data.pageNum,
                         pageSize: res.data.pageSize,
@@ -160,6 +175,11 @@
         clickNavigateToSendDyPage() {
             wx.navigateTo({
                 url: '../sendDynamic/index'
+            })
+        },
+        dialogConfirmClick() {
+            app.dialogImpowerClick(this, () => {
+                this.initData()
             })
         }
     }
