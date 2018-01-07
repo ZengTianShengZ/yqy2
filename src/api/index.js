@@ -19,3 +19,5 @@ exports.getUserJoinList = (data) => ajax('/v1/getUserJoinList', data)
 exports.getUserDynamicList = (data) => ajax('/v1/getUserDynamicList', data)
 
 exports.deleteUserDynamic = (data) => ajax('/v1/deleteUserDynamic', data)
+
+exports.loginUrl = 'https://yqy.mynatapp.cc/v2/login'

@@ -97,12 +97,7 @@
             </view>
         </form>
     </view>
-    <wxc-toast
-            is-show="{{$toast.show}}"
-            text="{{$toast.text}}"
-            icon="{{$toast.icon_str}}"
-            icon-image="{{$toast.icon_image}}">
-    </wxc-toast>
+    <app-toast id='appToast'></app-toast>
 </template>
 
 <script>
@@ -116,24 +111,18 @@
         config: {
             navigationBarTitleText: '发动态',
             usingComponents: {
-                "wxc-toast":'@minui/wxc-toast'
+                "wxc-toast":'@minui/wxc-toast',
+                "app-toast": '../../common/layout/app-toast',
             }
         },
         data: {
             imgTempFilePaths: [],
             str_address: '',
             str_description: '',
-            $toast: {
-                show:false,
-                text: '正在上传 ~~',
-                iconShow: true,
-                icon_image: '',
-                duration: '',
-                icon_str: ''  // 'yes', ''
-            },
             icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad() {
+            this.appToast = this.selectComponent("#appToast")
             this.initLocationAddress()
         },
         initLocationAddress() {
@@ -199,15 +188,12 @@
             this.setData({
                 str_description: e.detail.value.textarea
             })
-            app.getTokenInfo().then(res => {
-                if (res.openId) {
-                    this.uploadFiles()
-                } else {
-                    console.log('openId 不存在')
-                }
-            }).catch(err => {
-                console.log(err)
-            })
+            const token = storage.get('XCX-Admin') || ''
+            if (!token) {
+                wx.navigateTo({url: '../login/index'})
+                return
+            }
+            this.uploadFiles()
         },
         uploadFiles(){
             const _this = this
@@ -215,22 +201,22 @@
             const imgUrlList = this.data.imgTempFilePaths
 
             if (!description && imgUrlList.length <=0) {
-                this.$toast({
+                this.appToast.toastMsg({
                     text: '请分享内容或图片',
                     duration: 2000
                 })
                 return
             }
             if (description.length > 120) {
-                this.$toast({
+                this.appToast.toastMsg({
                     text: '分享内容不得超过120个字',
                     duration: 2000
                 })
                 return
             }
-            this.$toast({
+            this.appToast.toastMsg({
                 text: '正在上传 ~~',
-                icon_image: _this.data.icon_image
+                icon_image: this.data.icon_image
             })
             // 生成一个Promise对象的数组
             var promises = imgUrlList.map(function (item) {
@@ -252,73 +238,43 @@
                 _this.sendDynamic(imgListStr)
             }).catch(function (reason) {
                 console.log(reason)
-                this.$toast({
+                _this.appToast.toastMsg({
                     text: '图片上传出错',
                     duration: 2000
                 })
             });
         },
         sendDynamic(imgList) {
+            const _this = this
             const str_address = this.data.str_address
             const str_description = this.data.str_description
             const location = storage.get('location')
-            app.getTokenInfo().then(userInfo => {
-                console.log(userInfo)
-                if (!userInfo.openId) {
-                    this.$toast({
-                        text: '重新登录',
-                        duration: 2000
-                    })
-                    return
-                }
-                const sendData = {
-                    nickName: userInfo.nickName,
-                    avatarUrl: userInfo.avatarUrl,
-                    location: `${location.longitude},${location.latitude}`,
-                    address: str_address,
-                    description: str_description,
-                    imgList: imgList
-                }
-                console.log(sendData)
-                return api.postDynamic(sendData)
-            }).then(res => {
+            const userInfo = storage.get('userInfo')
+            const sendData = {
+                nickName: userInfo.nickName,
+                avatarUrl: userInfo.avatarUrl,
+                location: `${location.longitude},${location.latitude}`,
+                address: str_address,
+                description: str_description,
+                imgList: imgList
+            }
+            console.log(sendData)
+            api.postDynamic(sendData).then(res => {
                 console.log(res)
-                this.$toast({
+                _this.appToast.toastMsg({
                     text: '分享成功',
                     icon_str: 'yes',
                     duration: 4000
                 })
                 storage.set('refreshData', true)
-                wx.switchTab({
-                    url: '../home/index'
-                })
+                wx.switchTab({url: '../home/index'})
             }).catch(err => {
                 console.log(err)
-                this.$toast({
+                _this.appToast.toastMsg({
                     text: '网络出错 ~~',
                     duration: 2000
                 })
             })
-        },
-        $toast(obj) {
-            const {text = '', icon_image = '', icon_str= '', duration} =  obj
-            this.setData({
-                $toast: {
-                    show:true,
-                    text: text,
-                    icon_image: icon_image,
-                    icon_str: icon_str
-                }
-            })
-            if (duration) {
-                setTimeout(() => {
-                    this.setData({
-                        $toast: {
-                            show:false
-                        }
-                    })
-                }, duration)
-            }
         }
     }
 </script>

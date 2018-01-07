@@ -1,0 +1,137 @@
+<style>
+    .header-content{
+        width: 100%;
+        height: 300rpx;
+        background: linear-gradient(to bottom, #FFFFFF, rgba(255,76,77,0.3));
+    }
+    .logo-img{
+        display: block;
+        width: 200rpx;
+        height: 200rpx;
+        margin: 50px auto 0;
+        border-radius: 20rpx;
+    }
+    .content{
+        width: 100%;
+        height: 300rpx;
+        padding-top: 200rpx;
+        background: linear-gradient(to bottom, rgba(255,76,77,0.3), #FFFFFF);
+    }
+    .btn-login{
+        width: 80%;
+        height: 80rpx;
+        text-align: center;
+        color: rgb(255,76,77);
+        margin: 0 auto;
+        border: 1px solid rgb(255,76,77);
+        border-radius: 50rpx;
+        font-size: 30rpx;
+        line-height: 80rpx;
+    }
+</style>
+
+<template>
+    <view class="page-login">
+        <view class="header-content">
+            <image class="logo-img" src='http://oyn5he3v2.bkt.clouddn.com/tmp/wx3bcac52d10a4c3f7.o6zAJs_Zw13cp6cP52FHMpvhLh0w.78ac331949af98ffd27641ca8d0e8049.PNG'></image>
+        </view>
+        <view class="content">
+            <view class="btn-login" bindtap='clickGoLogin'>授权登录</view>
+        </view>
+    </view>
+</template>
+
+<script>
+    const storage = require('../../libs/storage')
+    const api = require('../../api/index.js')
+    export default {
+        config: {
+            navigationBarTitleText: '登录',
+            usingComponents: {
+            }
+        },
+        data: {
+        },
+        onLoad: function (option) {
+             this.initData()
+        },
+        onShow: function () {
+
+        },
+        initData() {
+            this.getLogin().then(r => {
+                console.log('login success ')
+                wx.navigateBack({delta: 1})
+            }, err => {
+            })
+        },
+        getLogin() {
+            const _this = this
+            return new Promise((resolve, reject) => {
+                wx.login({
+                    success: function (res) {
+                        _this.getInfo(resolve, reject, res.code)
+                    },
+                    fail: function (err) {
+                        console.log('login err: ', err)
+                        reject(err)
+                    }
+                })
+            })
+        },
+        getInfo(resolve, reject, code) {
+            wx.getUserInfo({
+                success: function (res) {
+                    let userInfo = res.userInfo
+                    const nickName = userInfo.nickName
+                    const avatarUrl = userInfo.avatarUrl
+                    const gender = userInfo.gender //性别
+                    const province = userInfo.province
+                    const city = userInfo.city
+                    const country = userInfo.country
+                    wx.request({
+                        url: api.loginUrl,
+                        method: 'POST',
+                        data: {
+                            code,
+                            nickName,
+                            avatarUrl,
+                            province,
+                            gender,
+                            city,
+                            country
+                        },
+                        success: function (res) {
+                            storage.set('XCX-Admin', res.data.data.token)
+                            storage.set('userInfo', userInfo)
+                            resolve(userInfo)
+                        },
+                        fail: function (err) {
+                            console.log('getInfo request err: ', err)
+                            reject(err)
+                        }
+                    })
+                },
+                fail: function (err) {
+                    console.log('getInfo err: ', err)
+                    reject(err)
+                }
+            })
+        },
+        clickGoLogin() {
+            const _this = this
+            //打开授权
+            wx.openSetting({
+                success: (res) => {
+                    if (res.authSetting["scope.userInfo"]) {
+                        _this.initData()
+                    }
+                    else {
+                    }
+                },
+                fail: function () {
+                }
+            })
+        }
+    }
+</script>
