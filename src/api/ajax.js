@@ -11,6 +11,11 @@ const req = function (url, data, method = 'POST') {
         const token = storage.get('XCX-Admin') || ''
         if (token) {
             header.Authorization = `Bearer ${token}`
+        } else {
+            if (_url.match('/v1/')) {
+                // 跳登录
+                wx.navigateTo({url: '../login/index'})
+            }
         }
         wx.request({
             url: _url,

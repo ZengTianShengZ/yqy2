@@ -249,10 +249,7 @@
             const str_address = this.data.str_address
             const str_description = this.data.str_description
             const location = storage.get('location')
-            const userInfo = storage.get('userInfo')
             const sendData = {
-                nickName: userInfo.nickName,
-                avatarUrl: userInfo.avatarUrl,
                 location: `${location.longitude},${location.latitude}`,
                 address: str_address,
                 description: str_description,

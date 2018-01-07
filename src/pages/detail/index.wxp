@@ -56,7 +56,7 @@
         <text class="text-comment">最新评论</text>
         <view class="comment-item">
             <comment-item
-                    wx:for="{{obj_commentData.list}}"
+                    wx:for="{{oCommentData.list}}"
                     itemData="{{item}}"
                     wx:key='index'
                     data-commentdata='{{item}}'
@@ -65,14 +65,14 @@
             <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
             <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="没评论啦 ~ 俺也发条评论" is-end="{{true}}"></wxc-loadmore>
         </view>
-        <view class="comment-none" wx:if="{{obj_commentData.list <= 0}}">暂无评论，欢迎抢沙发</view>
+        <view class="comment-none" wx:if="{{oCommentData.list <= 0}}">暂无评论，欢迎抢沙发</view>
         <view class="comment-textarea">
             <form class="f-jc-ac" bindsubmit="bindFormSubmit">
                  <textarea class="textarea"
                            auto-height="true"
                            auto-focus="{{textarea_auto_focus}}"
                            fixed="true"
-                           value="{{str_comment_value}}"
+                           value="{{sCommentValue}}"
                            show-confirm-bar=''
                            placeholder="写评论"
                            name="textarea"/>
@@ -117,13 +117,13 @@
             textarea_auto_focus: false,
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
-            str_comment_value: '',
-            obj_commentData: {
+            sCommentValue: '',
+            oCommentData: {
                 list: [],
                 pageNum: 0,   //????
                 pageSize: 10   //????
             },
-            obj_replyTo: {},
+            oReplyTo: {},
             $toast: {
                 show: false,
                 text: '正在上传 ~~',
@@ -165,7 +165,7 @@
          **/
         getCommentData(flag) {
             const itemId = this.data.itemId
-            let {pageNum, pageSize} = this.data.obj_commentData
+            let {pageNum, pageSize} = this.data.oCommentData
             if (flag === 'moreFlag') {
                 pageNum += 1
             }
@@ -176,9 +176,9 @@
             }).then(res => {
                 console.log(res)
                 if (res.success) {
-                    let listData = [...this.data.obj_commentData.list, ...res.data.list]
+                    let listData = [...this.data.oCommentData.list, ...res.data.list]
                     this.setData({
-                        obj_commentData:{
+                        oCommentData:{
                             list: listData,
                             pageNum: res.data.pageNum,
                             pageSize: res.data.pageSize,
@@ -200,7 +200,7 @@
             if (loadmoreFlag) {
                 return
             }
-            const {pageNum, totalPageNum} = this.data.obj_commentData
+            const {pageNum, totalPageNum} = this.data.oCommentData
             if (pageNum >= (totalPageNum - 1)) {
                 this.setData({loadmoreIsEndFlag: true})
                 return
@@ -222,61 +222,60 @@
                 return
             }
             const dynamicId = this.data.itemId
-            app.getTokenInfo().then(r => {
-                const {openId, nickName, avatarUrl} = r
-                const replyToNickName = comment.substring(1,comment.indexOf(':'))
-                let replyTo = {}
-                if (replyToNickName && replyToNickName === this.data.obj_replyTo.nickName) {
-                    console.log(replyToNickName)
-                    replyTo.nickName = replyToNickName
-                    replyTo.comment = this.data.obj_replyTo.comment
-                }
-                api.sumitCommont({
-                    nickName,
-                    avatarUrl,
-                    dynamicId,
-                    comment,
-                    replyTo
-                }).then(r => {
-                    console.log(r)
-                    if (r.success) {
-                        this.$toast({
-                            text: '评论成功 ~~',
-                            duration: 2000
-                        })
-                        // 更新评论列表数据
-                        let {list, pageNum, totalPageNum} = this.data.obj_commentData
-                        list.unshift(r.data)
-                        this.setData({obj_commentData: {
-                            list,
-                            pageNum,
-                            totalPageNum
-                        }})
-                        this.setData({str_comment_value: ''})
-                    }
-                }).catch(err => {
-                    console.log(err)
+            const replyToNickName = comment.substring(1,comment.indexOf(':'))
+            let replyTo = {}
+            if (replyToNickName && replyToNickName === this.data.oReplyTo.nickName) {
+                console.log(replyToNickName)
+                replyTo.nickName = replyToNickName
+                replyTo.comment = this.data.oReplyTo.comment
+            }
+            api.sumitCommont({
+                dynamicId,
+                comment,
+                replyTo
+            }).then(r => {
+                console.log(r)
+                if (r.success) {
                     this.$toast({
-                        text: '评论出错啦 ~~ 请检查网络',
+                        text: '评论成功 ~~',
                         duration: 2000
                     })
+                    // 更新评论列表数据
+                    let {list, pageNum, totalPageNum} = this.data.oCommentData
+                    list.unshift(r.data)
+                    this.setData({oCommentData: {
+                        list,
+                        pageNum,
+                        totalPageNum
+                    }})
+                    this.setData({sCommentValue: ''})
+                }
+            }).catch(err => {
+                console.log(err)
+                this.$toast({
+                    text: '评论出错啦 ~~ 请检查网络',
+                    duration: 2000
                 })
             })
         },
         clickCommentItem(event) {
             const commentdata = event.currentTarget.dataset.commentdata
             this.setData({
-                obj_replyTo: {
+                oReplyTo: {
                     nickName: commentdata.nickName,
                     comment: commentdata.comment
                 }
             })
             this.showDialog()
         },
+        /**
+         * 回复评论
+         * @param event
+         */
         clickReplyComment(event) {
-            const nickName = this.data.obj_replyTo.nickName
+            const nickName = this.data.oReplyTo.nickName
             this.setData({textarea_auto_focus: true})
-            this.setData({str_comment_value: `@${nickName}:`})
+            this.setData({sCommentValue: `@${nickName}:`})
             this.hideDialog()
         },
         showDialog() {
