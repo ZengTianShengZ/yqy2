@@ -14,9 +14,17 @@
         background: #afc4dc;
     }
 
-    .avatar-img {
-        width: 150 rpx;
-        height: 150 rpx;
+    .page-about, .avatar-image {
+        width: 150 rpx !important;
+        height: 150 rpx !important;
+        margin-top: 60 rpx;
+        border-radius: 80 rpx;
+        border: 4px solid #ffffff;
+    }
+
+    #avatar-image {
+        width: 150 rpx !important;
+        height: 150 rpx !important;
         margin-top: 60 rpx;
         border-radius: 80 rpx;
         border: 4px solid #ffffff;
@@ -39,8 +47,9 @@
 <template>
     <view class="page-about">
         <view class="user-info f-jc-ac-dc">
-            <image class="avatar-img" src="{{oUserInfo.avatarUrl}}"></image>
-            <text class="nick-name">{{oUserInfo.nickName}}</text>
+            <image style="width:150rpx;height:150rpx; margin-top:60rpx;border-radius:80rpx;border:2px solid #ffffff;"
+                   src="{{oUserInfo.avatarUrl}}"></image>
+            <text style="margin:20rpx;font-size:40rpx;" class="nick-name">{{oUserInfo.nickName}}</text>
         </view>
         <list-item
                 wx:for="{{oResData.list}}"
@@ -51,12 +60,6 @@
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
         <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
-        <wxc-dialog
-                class="wcx-dialog"
-                content="需要用户授权才可进一步操作"
-                confirm-text="确定"
-                bindconfirm="dialogConfirmClick">
-        </wxc-dialog>
     </view>
 </template>
 
@@ -74,7 +77,6 @@
                 "list-item": '../../common/layout/list-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
                 "wxc-icon": '@minui/wxc-icon',
-                "wxc-dialog": '@minui/wxc-dialog'
             }
         },
         data: {
@@ -86,10 +88,10 @@
             },
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
-            b_directionYup: true
+            directionYupFlag: true
         },
         onLoad: function (option) {
-
+            this.onStartPullDownRefresh()
         },
         initData() {
             app.getTokenInfo().then(r => {
@@ -102,8 +104,14 @@
             })
         },
         onShow: function () {
-            this.initData()
-            this.onStartPullDownRefresh()
+            const token = storage.get('XCX-Admin') || ''
+            const userInfo = storage.get('userInfo')
+            this.setData({oUserInfo: userInfo})
+            if (token) {
+                this.onStartPullDownRefresh()
+            } else {
+                wx.stopPullDownRefresh()
+            }
         },
         getData(flag) {
             let {pageNum, pageSize} = this.data.oResData
@@ -173,11 +181,6 @@
         clickNavigateToSendDyPage() {
             wx.navigateTo({
                 url: '../sendDynamic/index'
-            })
-        },
-        dialogConfirmClick() {
-            app.dialogImpowerClick(this, () => {
-                this.initData()
             })
         }
     }
