@@ -201,9 +201,7 @@
             clickDeleteBtn(event) {
                 const itemId = event.currentTarget.dataset.itemid
                 app.getTokenInfo().then(r => {
-                    const {openId} = r
                     api.deleteUserDynamic({
-                        openId,
                         id: itemId
                     }).then(res => {
                         if (res.success) {

@@ -272,7 +272,6 @@
                     return
                 }
                 const sendData = {
-                    openId: userInfo.openId,
                     nickName: userInfo.nickName,
                     avatarUrl: userInfo.avatarUrl,
                     location: `${location.longitude},${location.latitude}`,

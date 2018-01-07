@@ -232,7 +232,6 @@
                     replyTo.comment = this.data.obj_replyTo.comment
                 }
                 api.sumitCommont({
-                    openId,
                     nickName,
                     avatarUrl,
                     dynamicId,

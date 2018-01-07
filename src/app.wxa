@@ -141,7 +141,7 @@
                             country
                         },
                         success: function (res) {
-                            userInfo.openId = res.data.data.openId
+                            storage.set('XCX-Admin', res.data.data.token)
                             storage.set('userInfo', userInfo)
                             resolve(userInfo)
                         },

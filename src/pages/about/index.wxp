@@ -107,12 +107,10 @@
         },
         getData(flag) {
             let {pageNum, pageSize} = this.data.oResData
-            const openId = this.data.oUserInfo.openId
             if (flag === 'moreFlag') {
                 pageNum += 1
             }
             api.getUserDynamicList({
-                openId,
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
