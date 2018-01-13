@@ -27,6 +27,7 @@
          <list-item
                 wx:for="{{obj_resData.list}}"
                 itemData="{{item}}"
+                itemIndex="{{index}}"
                 wx:key='index'>
         </list-item>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>

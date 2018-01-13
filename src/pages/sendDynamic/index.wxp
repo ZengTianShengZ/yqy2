@@ -255,7 +255,6 @@
                 description: str_description,
                 imgList: imgList
             }
-            console.log(sendData)
             api.postDynamic(sendData).then(res => {
                 console.log(res)
                 _this.appToast.toastMsg({

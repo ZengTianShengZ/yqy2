@@ -52,7 +52,7 @@
 
 <template>
     <view class="page-detail" wx:if="{{showPageFlag}}">
-        <list-item isNavigateTo="false" itemData="{{itemData}}"></list-item>
+        <list-item isNavigateTo="false" itemData="{{itemData}}" itemIndex="{{0}}"></list-item>
         <text class="text-comment">最新评论</text>
         <view class="comment-item">
             <comment-item
@@ -215,8 +215,8 @@
          * @param e
          */
         bindFormSubmit: function (e) {
-            const comment = e.detail.value.textarea
-            if (!comment) {
+            const commentStr = e.detail.value.textarea
+            if (!commentStr) {
                 this.$toast({
                     text: '评论为空 ~~',
                     duration: 2000
@@ -224,12 +224,13 @@
                 return
             }
             const dynamicId = this.data.itemId
-            const replyToNickName = comment.substring(1,comment.indexOf(':'))
+            const replyToNickName = commentStr.substring(1,commentStr.indexOf(':'))
+            let comment = commentStr.substring(commentStr.indexOf(':'), commentStr.length)
             let replyTo = {}
             if (replyToNickName && replyToNickName === this.data.oReplyTo.nickName) {
-                console.log(replyToNickName)
                 replyTo.nickName = replyToNickName
                 replyTo.comment = this.data.oReplyTo.comment
+                comment = commentStr.substring(commentStr.indexOf(':')+1, commentStr.length)
             }
             api.sumitCommont({
                 dynamicId,

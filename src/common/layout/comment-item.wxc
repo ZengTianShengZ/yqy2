@@ -65,16 +65,16 @@
             itemData: {
                 type: Object,
                 value: {
-                    openId: '',
-                    dynamicId: '2222',
-                    nickName: '曾田生',
-                    time: "今天 12:16",
-                    avatarUrl: 'http://oyn5he3v2.bkt.clouddn.com/defaultAvatar.png',
-                    comment: '评论，评论，评论，评论，评论，评论，',
-                    replyTo: {
-                        nickName: 'klkl',
-                        comment: '回复，回复，回复，回复，回复，'
-                    }
+//                    openId: '',
+//                    dynamicId: '2222',
+//                    nickName: '曾田生',
+//                    time: "今天 12:16",
+//                    avatarUrl: 'http://oyn5he3v2.bkt.clouddn.com/defaultAvatar.png',
+//                    comment: '评论，评论，评论，评论，评论，评论，',
+//                    replyTo: {
+//                        nickName: 'klkl',
+//                        comment: '回复，回复，回复，回复，回复，'
+//                    }
                 }
             }
         },

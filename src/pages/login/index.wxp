@@ -21,9 +21,9 @@
         width: 80%;
         height: 80rpx;
         text-align: center;
-        color: rgb(255,76,77);
+        color: #FEC4AA;
         margin: 0 auto;
-        border: 1px solid rgb(255,76,77);
+        border: 1px solid #FEC4AA;
         border-radius: 50rpx;
         font-size: 30rpx;
         line-height: 80rpx;

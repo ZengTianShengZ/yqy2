@@ -13,6 +13,9 @@
         padding-top: 20rpx;
         border-top: 1px solid rgba(0,0,0,0.2);
     }
+    .top_first {
+        border-top: 1px solid transparent;
+    }
     .avatarUrl{
         display: block;
         width: 120rpx;
@@ -84,7 +87,7 @@
 </style>
 <template>
     <view class="list-item" data-itemId='{{itemData._id}}' bindtap='clickNavigateToDetailPage'>
-        <view class="top f-js-ac">
+        <view class="top f-js-ac {{itemIndex===0?'top_first':''}}">
             <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
             <view class="top-right">
                 <view class="'top-name">
@@ -170,6 +173,10 @@
 //                    time: "11月15号",
 //                    _id: "5a0c60b4ba97b7fac9ce8cdb"
                 }
+            },
+            itemIndex: {
+                type: Number,
+                value: ''
             }
         },
         data: {

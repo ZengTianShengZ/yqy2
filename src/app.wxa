@@ -15,9 +15,9 @@
             window: {
                 backgroundTextStyle: 'dark',
                 backgroundColor: '#efefef',
-                navigationBarBackgroundColor: '#ffffff',
+                navigationBarBackgroundColor: '#FEC4AA',
                 navigationBarTitleText: '方圆两公里',
-                navigationBarTextStyle: 'black'
+                navigationBarTextStyle: '#FFFFFF'
             },
             tabBar: {
                 color: '#8a8a8a',

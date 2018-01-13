@@ -29,7 +29,7 @@
     }
 
     .user-info {
-        background: #afc4dc;
+        background: #FEC4AA;
     }
     .nick-name{
         margin: 20rpx;
@@ -59,6 +59,7 @@
                 wx:for="{{oResData.list}}"
                 itemData="{{item}}"
                 moreBtnFlag="{{true}}"
+                itemIndex="{{index}}"
                 wx:key='index'>
         </list-item>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
