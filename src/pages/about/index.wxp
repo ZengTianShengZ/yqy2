@@ -7,49 +7,53 @@
     }
 
     .page-about {
+        position: relative;
+        top:0;
+        left: 0;
+    }
 
+    .content-location{
+        position: absolute;
+        top:40rpx;
+        right: 40rpx;
+    }
+    .text-location{
+        color: #FFFFFF;
+        font-size: 26rpx;
+        vertical-align: 12rpx;
+        margin-right: 5rpx;
+    }
+    .icon-location{
+        width: 40rpx;
+        height: 40rpx;
     }
 
     .user-info {
         background: #afc4dc;
     }
-
-    .page-about, .avatar-image {
-        width: 150 rpx !important;
-        height: 150 rpx !important;
-        margin-top: 60 rpx;
-        border-radius: 80 rpx;
-        border: 4px solid #ffffff;
+    .nick-name{
+        margin: 20rpx;
+        font-size: 36rpx;
+        color: #FFFFFF;
     }
-
-    #avatar-image {
-        width: 150 rpx !important;
-        height: 150 rpx !important;
-        margin-top: 60 rpx;
-        border-radius: 80 rpx;
-        border: 4px solid #ffffff;
-    }
-
-    .nick-name {
-        font-size: 40 rpx;
-        color: #ffffff;
-        margin: 20 rpx;
-    }
-
     .res-data-none {
         text-align: center;
-        font-size: 34 rpx;
-        color: #343434;
-        padding: 50 rpx 0;
+        font-size: 34rpx;
+        color: #4e4e4e;
+        padding: 50rpx 0;
     }
 </style>
 
 <template>
     <view class="page-about">
+        <view class="content-location" bindtap="chooseLocationBtnClick">
+            <text class="text-location">LC</text>
+            <image class="icon-location" src="http://oyn5he3v2.bkt.clouddn.com/iconLocation.png"></image>
+        </view>
         <view class="user-info f-jc-ac-dc">
             <image style="width:150rpx;height:150rpx; margin-top:60rpx;border-radius:80rpx;border:2px solid #ffffff;"
                    src="{{oUserInfo.avatarUrl}}"></image>
-            <text style="margin:20rpx;font-size:40rpx;" class="nick-name">{{oUserInfo.nickName}}</text>
+            <text class="nick-name">{{oUserInfo.nickName}}</text>
         </view>
         <list-item
                 wx:for="{{oResData.list}}"
@@ -60,6 +64,8 @@
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
         <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
+        <view class="res-data-none" wx:if="{{resDataNoneFlag}}">下拉刷新登录 ~~</view>
+        <app-toast id='appToast' toastMsg="{{$toast}}"></app-toast>
     </view>
 </template>
 
@@ -77,6 +83,7 @@
                 "list-item": '../../common/layout/list-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
                 "wxc-icon": '@minui/wxc-icon',
+                "app-toast": '../../common/layout/app-toast'
             }
         },
         data: {
@@ -88,28 +95,22 @@
             },
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
-            directionYupFlag: true
+            directionYupFlag: true,
+            resDataNoneFlag: false
         },
         onLoad: function (option) {
+            this.appToast = this.selectComponent("#appToast")
             this.onStartPullDownRefresh()
-        },
-        initData() {
-            app.getTokenInfo().then(r => {
-                console.log(r)
-                this.setData({oUserInfo: r})
-                this.onStartPullDownRefresh()
-            }, err => {
-                app.showDialog(this)
-                console.log('用户拒绝授权')
-            })
         },
         onShow: function () {
             const token = storage.get('XCX-Admin') || ''
             const userInfo = storage.get('userInfo')
             this.setData({oUserInfo: userInfo})
             if (token) {
+                this.setData({resDataNoneFlag: false})
                 this.onStartPullDownRefresh()
             } else {
+                this.setData({resDataNoneFlag: true})
                 wx.stopPullDownRefresh()
             }
         },
@@ -182,6 +183,28 @@
             wx.navigateTo({
                 url: '../sendDynamic/index'
             })
-        }
+        },
+        chooseLocationBtnClick() {
+            const _this = this
+            wx.chooseLocation({
+                success: function(res) {
+                    console.log(res)
+                    if (res.name) {
+                        storage.set('location', {
+                            horizontalAccuracy: 65,
+                            latitude: res.latitude,
+                            longitude: res.longitude,
+                            speed: -1,
+                            verticalAccuracy: 65
+                        })
+                        storage.set('refreshData', true)
+                        _this.appToast.toastMsg({
+                            text: `已为您切换到 【${res.name}】`,
+                            duration: 2000
+                        })
+                    }
+                }
+            })
+        },
     }
 </script>
