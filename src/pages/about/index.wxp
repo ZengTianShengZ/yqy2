@@ -31,7 +31,7 @@
     }
 
     .user-info {
-        background: #FEC4AA;
+        background: #FB7763;
     }
     .nick-name{
         margin: 20rpx;
@@ -102,6 +102,10 @@
             resDataNoneFlag: false
         },
         onLoad: function (option) {
+            wx.setNavigationBarColor({
+                frontColor: '#ffffff',
+                backgroundColor: '#FB7763'
+            })
             this.appToast = this.selectComponent("#appToast")
             this.onStartPullDownRefresh()
         },

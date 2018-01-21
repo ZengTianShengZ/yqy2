@@ -13,5 +13,5 @@ export const getFIX_URL = () => {
     } else {
         FIX_URL = 'https://yqy233.com/xcx'
     }
-    return FIX_URL = 'https://yqy.mynatapp.cc'
+    return FIX_URL = 'https://yqy233.com/xcx'
 }

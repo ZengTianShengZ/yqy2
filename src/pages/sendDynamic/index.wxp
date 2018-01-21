@@ -67,7 +67,7 @@
         margin-top: 30rpx;
         width: 90%;
         color: #ffffff;
-        background: #FEC4AA;
+        background: #FE5B51;
     }
 </style>
 <template>

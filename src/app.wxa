@@ -15,13 +15,13 @@
             window: {
                 backgroundTextStyle: 'dark',
                 backgroundColor: '#efefef',
-                navigationBarBackgroundColor: '#FEC4AA',
+                navigationBarBackgroundColor: '#FE5B51',
                 navigationBarTitleText: '方圆两公里',
                 navigationBarTextStyle: '#FFFFFF'
             },
             tabBar: {
                 color: '#8a8a8a',
-                selectedColor: '#d81e06',
+                selectedColor: '#FE5B51',
                 borderStyle: 'black',
                 backgroundColor: '#ffffff',
                 list: [

@@ -83,13 +83,19 @@
                 <button style="padding:0; margin: 0;border: none" class="btn-submit" form-type="submit">发送</button>
             </form>
         </view>
-        <app-toast id='appToast'></app-toast>
         <wxc-dialog
+                id='dialog'
                 class="wcx-dialog"
                 content="回复评论"
                 confirm-text="回复"
                 bindconfirm="clickReplyComment">
         </wxc-dialog>
+        <wxc-toast
+                is-show="{{toastMsg.show}}"
+                text="{{toastMsg.text}}"
+                icon="{{toastMsg.icon_str}}"
+                icon-image="{{toastMsg.icon_image}}">
+        </wxc-toast>
     </view>
 </template>
 
@@ -106,6 +112,7 @@
                 "list-item": '../../common/layout/list-item',
                 "comment-item": '../../common/layout/comment-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
+                "wxc-toast": '@minui/wxc-toast',
                 "app-toast": '../../common/layout/app-toast',
                 "wxc-dialog": '@minui/wxc-dialog'
             }
@@ -123,11 +130,18 @@
                 pageNum: 0,   //????
                 pageSize: 10   //????
             },
+            toastMsg: {
+                show: false,
+                text: '正在上传 ~~',
+                iconShow: true,
+                icon_image: '',
+                duration: '',
+                icon_str: '',  // 'yes', ''
+            },
             oReplyTo: {},
             icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad: function (option) {
-            this.appToast = this.selectComponent("#appToast")
             wx.showShareMenu({
                 withShareTicket: true
             })
@@ -143,6 +157,10 @@
          * 获取 Dynamic
          **/
         getData() {
+            this.setData({toastMsg: {
+                text: '网络出错啦 ~',
+                duration: 2000
+            }})
             wx.showLoading({title: "加载..."})
             const id = this.data.itemId
             api.getDetailDynamic({id}).then(res => {
@@ -150,16 +168,16 @@
                     this.setData({itemData: res.data})
                     this.setData({showPageFlag: true})
                 } else {
-                    this.appToast.toastMsg({
+                    this.setData({toastMsg: {
                         text: res.msg || '网络出错啦 ~',
                         duration: 2000
-                    })
+                    }})
                 }
             }).catch(err => {
-                this.appToast.toastMsg({
+                this.setData({toastMsg: {
                     text: '网络出错啦 ~',
                     duration: 2000
-                })
+                }})
             }).then(() => {
                 wx.hideLoading()
             })
@@ -189,13 +207,13 @@
                         }
                     })
                 } else {
-                    this.appToast.toastMsg({
+                    this.toastMsg({
                         text: res.msg || '网络出错啦 ~',
                         duration: 2000
                     })
                 }
             }).catch(err => {
-                this.appToast.toastMsg({
+                this.toastMsg({
                     text: '网络出错啦 ~',
                     duration: 2000
                 })
@@ -226,8 +244,8 @@
         bindFormSubmit: function (e) {
             const commentStr = e.detail.value.textarea
             if (!commentStr) {
-                this.appToast.toastMsg({
-                    text: '评论为空 ~~',
+                this.toastMsg({
+                    text: '评论不能为空 ~~',
                     duration: 2000
                 })
                 return
@@ -247,7 +265,7 @@
                 replyTo
             }).then(r => {
                 if (r.success) {
-                    this.appToast.toastMsg({
+                    this.toastMsg({
                         text: '评论成功 ~~',
                         duration: 2000
                     })
@@ -262,13 +280,13 @@
                     }})
                     this.setData({sCommentValue: ''})
                 } else {
-                    this.appToast.toastMsg({
+                    this.toastMsg({
                         text: res.msg || '网络出错啦 ~',
                         duration: 2000
                     })
                 }
             }).catch(err => {
-                this.appToast.toastMsg({
+                this.toastMsg({
                     text: '网络出错啦 ~',
                     duration: 2000
                 })
@@ -301,6 +319,26 @@
         hideDialog() {
             const dialogComponent = this.selectComponent('.wcx-dialog')
             dialogComponent && dialogComponent.hide()
+        },
+        toastMsg(obj) {
+            const {text = '', icon_image = '', icon_str = '', duration} = obj
+            this.setData({
+                toastMsg: {
+                    show: true,
+                    text: text,
+                    icon_image: icon_image,
+                    icon_str: icon_str
+                }
+            })
+            if (duration) {
+                setTimeout(() => {
+                    this.setData({
+                        toastMsg: {
+                            show: false
+                        }
+                    })
+                }, duration)
+            }
         }
     }
 </script>
