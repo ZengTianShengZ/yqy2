@@ -5,8 +5,8 @@
     }
     .avatarUrl{
         display: block;
-        width: 100rpx;
-        height: 86rpx;
+        width: 90rpx;
+        height: 78rpx;
         border-radius: 50rpx;
     }
     .top-right{
@@ -15,10 +15,12 @@
         border-bottom: 1px solid rgba(99, 99, 99, 0.1);
     }
     .top-name{
-        font-size: 34rpx;
+        line-height: 1.2;
+        font-size: 32rpx;
     }
     .top-time{
-        font-size: 26rpx;
+        line-height: 1;
+        font-size: 24rpx;
         color: #989898;
     }
     .top-address{
@@ -41,7 +43,7 @@
     <view class="comment-item f-js-as">
         <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
         <view class="top-right">
-            <view class="'top-name">{{itemData.nickName}}</view>
+            <view class="top-name">{{itemData.nickName}}</view>
             <text class="top-time">{{itemData.time}}</text>
             <view class="content">
                 <text wx-if="{{itemData.replyTo.nickName}}" class="reply-to-text">回复 @{{itemData.replyTo.nickName}}：</text>

@@ -256,18 +256,23 @@
                 imgList: imgList
             }
             api.postDynamic(sendData).then(res => {
-                console.log(res)
-                _this.appToast.toastMsg({
-                    text: '分享成功',
-                    icon_str: 'yes',
-                    duration: 4000
-                })
-                storage.set('refreshData', true)
-                wx.switchTab({url: '../home/index'})
+                if (res.success) {
+                    _this.appToast.toastMsg({
+                        text: '分享成功',
+                        icon_str: 'yes',
+                        duration: 4000
+                    })
+                    storage.set('refreshData', true)
+                    wx.switchTab({url: '../home/index'})
+                } else {
+                    _this.appToast.toastMsg({
+                        text: res.msg || '网络出错啦 ~',
+                        duration: 2000
+                    })
+                }
             }).catch(err => {
-                console.log(err)
                 _this.appToast.toastMsg({
-                    text: '网络出错 ~~',
+                    text: '网络出错啦 ~',
                     duration: 2000
                 })
             })

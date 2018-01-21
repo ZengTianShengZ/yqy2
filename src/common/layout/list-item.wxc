@@ -7,7 +7,6 @@
         left: 0;
         padding:0 20rpx 20rpx;
         box-sizing: border-box;
-        overflow-x: hidden;
     }
     .top{
         padding-top: 20rpx;
@@ -18,8 +17,8 @@
     }
     .avatarUrl{
         display: block;
-        width: 120rpx;
-        height: 100rpx;
+        width: 109rpx;
+        height: 90rpx;
         border-radius: 50rpx;
     }
     .top-right{
@@ -27,7 +26,10 @@
         margin-left: 20rpx;
     }
     .top-name{
-        font-size: 36rpx;
+        font-size: 34rpx;
+    }
+    .nick-name{
+        color: #5390b1;
     }
     .more-btn{
         width: 36rpx;
@@ -35,7 +37,7 @@
         color: #888888;
     }
     .top-time{
-        font-size: 28rpx;
+        font-size: 26rpx;
         color: #888888;
     }
     .top-address{
@@ -91,7 +93,7 @@
             <image class="avatarUrl" src='{{itemData.avatarUrl}}'></image>
             <view class="top-right">
                 <view class="'top-name">
-                    <text>{{itemData.nickName}}</text>
+                    <text class="nick-name">{{itemData.nickName}}</text>
                     <image catchtap='clickMoreBtn'
                            wx:if="{{moreBtnFlag}}"
                            class="more-btn fr"

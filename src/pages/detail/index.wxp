@@ -1,4 +1,8 @@
 <style>
+    .page-detail{
+        width: 100%;
+        overflow: hidden;
+    }
     .f-jc-ac {
         display: flex;
         justify-content: flex-end;
@@ -11,7 +15,7 @@
         padding: 30rpx 0;
     }
     .comment-item {
-        padding: 10rpx;
+        padding: 25rpx;
         box-sizing: border-box;
         margin-bottom: 120rpx;
     }
@@ -79,12 +83,7 @@
                 <button style="padding:0; margin: 0;border: none" class="btn-submit" form-type="submit">发送</button>
             </form>
         </view>
-        <wxc-toast
-                is-show="{{$toast.show}}"
-                text="{{$toast.text}}"
-                icon="{{$toast.icon_str}}"
-                icon-image="{{$toast.icon_image}}">
-        </wxc-toast>
+        <app-toast id='appToast'></app-toast>
         <wxc-dialog
                 class="wcx-dialog"
                 content="回复评论"
@@ -107,7 +106,7 @@
                 "list-item": '../../common/layout/list-item',
                 "comment-item": '../../common/layout/comment-item',
                 "wxc-loadmore": '@minui/wxc-loadmore',
-                "wxc-toast": '@minui/wxc-toast',
+                "app-toast": '../../common/layout/app-toast',
                 "wxc-dialog": '@minui/wxc-dialog'
             }
         },
@@ -125,17 +124,10 @@
                 pageSize: 10   //????
             },
             oReplyTo: {},
-            $toast: {
-                show: false,
-                text: '正在上传 ~~',
-                iconShow: true,
-                icon_image: '',
-                duration: '',
-                icon_str: ''  // 'yes', ''
-            },
             icon_image: 'http://oyn5he3v2.bkt.clouddn.com//yqy/icon/222112/icon_loading.gif'
         },
         onLoad: function (option) {
+            this.appToast = this.selectComponent("#appToast")
             wx.showShareMenu({
                 withShareTicket: true
             })
@@ -154,10 +146,20 @@
             wx.showLoading({title: "加载..."})
             const id = this.data.itemId
             api.getDetailDynamic({id}).then(res => {
-                this.setData({itemData: res.data})
-                this.setData({showPageFlag: true})
+                if (res.success) {
+                    this.setData({itemData: res.data})
+                    this.setData({showPageFlag: true})
+                } else {
+                    this.appToast.toastMsg({
+                        text: res.msg || '网络出错啦 ~',
+                        duration: 2000
+                    })
+                }
             }).catch(err => {
-                console.log(err)
+                this.appToast.toastMsg({
+                    text: '网络出错啦 ~',
+                    duration: 2000
+                })
             }).then(() => {
                 wx.hideLoading()
             })
@@ -176,7 +178,6 @@
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
-                console.log(res)
                 if (res.success) {
                     let listData = [...this.data.oCommentData.list, ...res.data.list]
                     this.setData({
@@ -187,9 +188,17 @@
                             totalPageNum: res.data.totalPageNum
                         }
                     })
+                } else {
+                    this.appToast.toastMsg({
+                        text: res.msg || '网络出错啦 ~',
+                        duration: 2000
+                    })
                 }
             }).catch(err => {
-                console.log(err)
+                this.appToast.toastMsg({
+                    text: '网络出错啦 ~',
+                    duration: 2000
+                })
             }).then(() => {
                 this.setData({loadmoreFlag: false})
             })
@@ -217,7 +226,7 @@
         bindFormSubmit: function (e) {
             const commentStr = e.detail.value.textarea
             if (!commentStr) {
-                this.$toast({
+                this.appToast.toastMsg({
                     text: '评论为空 ~~',
                     duration: 2000
                 })
@@ -237,13 +246,13 @@
                 comment,
                 replyTo
             }).then(r => {
-                console.log(r)
                 if (r.success) {
-                    this.$toast({
+                    this.appToast.toastMsg({
                         text: '评论成功 ~~',
                         duration: 2000
                     })
                     // 更新评论列表数据
+                    r.data.time = '刚刚'
                     let {list, pageNum, totalPageNum} = this.data.oCommentData
                     list.unshift(r.data)
                     this.setData({oCommentData: {
@@ -252,11 +261,15 @@
                         totalPageNum
                     }})
                     this.setData({sCommentValue: ''})
+                } else {
+                    this.appToast.toastMsg({
+                        text: res.msg || '网络出错啦 ~',
+                        duration: 2000
+                    })
                 }
             }).catch(err => {
-                console.log(err)
-                this.$toast({
-                    text: '评论出错啦 ~~ 请检查网络',
+                this.appToast.toastMsg({
+                    text: '网络出错啦 ~',
                     duration: 2000
                 })
             })
@@ -288,26 +301,6 @@
         hideDialog() {
             const dialogComponent = this.selectComponent('.wcx-dialog')
             dialogComponent && dialogComponent.hide()
-        },
-        $toast(obj) {
-            const {text = '', icon_image = '', icon_str = '', duration} = obj
-            this.setData({
-                $toast: {
-                    show: true,
-                    text: text,
-                    icon_image: icon_image,
-                    icon_str: icon_str
-                }
-            })
-            if (duration) {
-                setTimeout(() => {
-                    this.setData({
-                        $toast: {
-                            show: false
-                        }
-                    })
-                }, duration)
-            }
         }
     }
 </script>

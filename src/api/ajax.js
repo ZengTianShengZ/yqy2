@@ -1,6 +1,6 @@
 const storage = require('../libs/storage')
+const FIX_URL = require('../utils').getFIX_URL()
 
-const FIX_URL = 'https://yqy.mynatapp.cc'
 const req = function (url, data, method = 'POST') {
     const _url = `${FIX_URL}${url}`
     return new Promise((resolve, reject) => {

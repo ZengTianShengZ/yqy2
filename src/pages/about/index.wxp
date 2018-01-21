@@ -10,6 +10,8 @@
         position: relative;
         top:0;
         left: 0;
+        width: 100%;
+        overflow: hidden;
     }
 
     .content-location{
@@ -63,7 +65,7 @@
                 wx:key='index'>
         </list-item>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
-        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
+        <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~" is-end="{{true}}"></wxc-loadmore>
         <view class="res-data-none" wx:if="{{oResData.list <= 0}}">暂无数据，去分享一条吧 ~~</view>
         <view class="res-data-none" wx:if="{{resDataNoneFlag}}">下拉刷新登录 ~~</view>
         <app-toast id='appToast' toastMsg="{{$toast}}"></app-toast>
@@ -124,22 +126,32 @@
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
-                let listData = []
-                if (flag === 'refreshFlag') {
-                    listData = res.data.list
-                } else {
-                    listData = [...this.data.oResData.list, ...res.data.list]
-                }
-                this.setData({
-                    oResData: {
-                        list: listData,
-                        pageNum: res.data.pageNum,
-                        pageSize: res.data.pageSize,
-                        totalPageNum: res.data.totalPageNum
+                if (res.success) {
+                    let listData = []
+                    if (flag === 'refreshFlag') {
+                        listData = res.data.list
+                    } else {
+                        listData = [...this.data.oResData.list, ...res.data.list]
                     }
-                })
+                    this.setData({
+                        oResData: {
+                            list: listData,
+                            pageNum: res.data.pageNum,
+                            pageSize: res.data.pageSize,
+                            totalPageNum: res.data.totalPageNum
+                        }
+                    })
+                } else {
+                    this.appToast.toastMsg({
+                        text: res.msg || '获取列表失败',
+                        duration: 2000
+                    })
+                }
             }).catch(err => {
-                console.log(err)
+                this.appToast.toastMsg({
+                    text: '网络出错啦 ~',
+                    duration: 2000
+                })
             }).then(() => {
                 wx.stopPullDownRefresh()
                 this.setData({loadmoreFlag: false})

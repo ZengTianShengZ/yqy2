@@ -38,6 +38,7 @@
         <view class="content">
             <view class="btn-login" bindtap='clickGoLogin'>授权登录</view>
         </view>
+        <app-toast id='appToast'></app-toast>
     </view>
 </template>
 
@@ -48,19 +49,21 @@
         config: {
             navigationBarTitleText: '登录',
             usingComponents: {
+                "app-toast": '../../common/layout/app-toast'
             }
         },
         data: {
         },
         onLoad: function (option) {
-             this.initData()
+            this.appToast = this.selectComponent("#appToast")
+            this.initData()
         },
         onShow: function () {
 
         },
         initData() {
+            const _this = this
             this.getLogin().then(r => {
-                console.log('login success ')
                 wx.navigateBack({delta: 1})
             }, err => {
             })
@@ -89,6 +92,7 @@
                     const province = userInfo.province
                     const city = userInfo.city
                     const country = userInfo.country
+                    wx.showLoading({title: "加载..."})
                     wx.request({
                         url: api.loginUrl,
                         method: 'POST',
@@ -104,10 +108,12 @@
                         success: function (res) {
                             storage.set('XCX-Admin', res.data.data.token)
                             storage.set('userInfo', userInfo)
+                            wx.hideLoading()
                             resolve(userInfo)
                         },
                         fail: function (err) {
                             console.log('getInfo request err: ', err)
+                            wx.hideLoading()
                             reject(err)
                         }
                     })

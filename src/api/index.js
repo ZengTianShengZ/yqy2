@@ -1,4 +1,5 @@
 const ajax = require('./ajax')
+const FIX_URL = require('../utils').getFIX_URL()
 
 exports.login = (data) => ajax('/login', data)
 
@@ -20,4 +21,6 @@ exports.getUserDynamicList = (data) => ajax('/v1/getUserDynamicList', data)
 
 exports.deleteUserDynamic = (data) => ajax('/v1/deleteUserDynamic', data)
 
-exports.loginUrl = 'https://yqy.mynatapp.cc/v2/login'
+exports.loginUrl = `${FIX_URL}/v2/login`
+
+exports.uptokenURL = `${FIX_URL}/v2/qnUptoken`

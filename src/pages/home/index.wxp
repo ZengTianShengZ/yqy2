@@ -1,4 +1,8 @@
 <style>
+    .list-content{
+        width: 100%;
+        overflow: hidden;
+    }
     .send-dynamic-btn{
         position: fixed;
         bottom: 60rpx;
@@ -24,12 +28,14 @@
 
 <template>
      <view class="page-home">
-         <list-item
-                wx:for="{{obj_resData.list}}"
-                itemData="{{item}}"
-                itemIndex="{{index}}"
-                wx:key='index'>
-        </list-item>
+         <view class="list-content">
+             <list-item
+                     wx:for="{{obj_resData.list}}"
+                     itemData="{{item}}"
+                     itemIndex="{{index}}"
+                     wx:key='index'>
+             </list-item>
+         </view>
         <wxc-loadmore wx:if='{{loadmoreFlag}}' text="加载更多..." icon="{{true}}"></wxc-loadmore>
         <wxc-loadmore wx:if='{{loadmoreIsEndFlag}}' text="到底啦 ~ 俺也发一条" is-end="{{true}}"></wxc-loadmore>
         <view bindtap="clickNavigateToSendDyPage" class="send-dynamic-btn {{b_directionYup ? 'imgIconAminUp' : 'imgIconAminDown'}}">
@@ -41,7 +47,7 @@
                 title='网络加载失败，点击刷新'>
 
         </abnor>
-         <app-toast id='appToast' toastMsg="{{$toast}}"></app-toast>
+         <app-toast id='appToast'></app-toast>
      </view>
  </template>
 
@@ -68,7 +74,6 @@
                 pageNum: 0,   //????
                 pageSize: 20   //????
             },
-            $toast: {},
             loadmoreFlag: false,
             loadmoreIsEndFlag: false,
             b_directionYup: true,
@@ -105,25 +110,32 @@
                 pageNum: pageNum,
                 pageSize: pageSize
             }).then(res => {
-                let listData = []
-                if (flag === 'refreshFlag') {
-                    listData = res.data.list
-                } else {
-                    listData = [...this.data.obj_resData.list, ...res.data.list]
-                }
-                this.setData({
-                    obj_resData:{
-                        list: listData,
-                        pageNum: res.data.pageNum,
-                        pageSize: res.data.pageSize,
-                        totalPageNum: res.data.totalPageNum
+                if (res.success) {
+                    let listData = []
+                    if (flag === 'refreshFlag') {
+                        listData = res.data.list
+                    } else {
+                        listData = [...this.data.obj_resData.list, ...res.data.list]
                     }
-                })
+                    this.setData({
+                        obj_resData:{
+                            list: listData,
+                            pageNum: res.data.pageNum,
+                            pageSize: res.data.pageSize,
+                            totalPageNum: res.data.totalPageNum
+                        }
+                    })
+                } else {
+                    this.appToast.toastMsg({
+                        text: res.msg || '获取列表失败',
+                        duration: 2000
+                    })
+                }
             }).catch(err => {
-//                if (!this.data.obj_resData.list || this.data.obj_resData.list.length === 0) {
-//                    this.setData({abnorShowFlag: true})
-//                }
-                console.log(err)
+                this.appToast.toastMsg({
+                    text: '网络出错啦 ~',
+                    duration: 2000
+                })
             }).then(() => {
                 wx.stopPullDownRefresh()
                 this.setData({loadmoreFlag: false})
