@@ -6,8 +6,6 @@
 export const getFIX_URL = () => {
     let FIX_URL = 'https://yqy.mynatapp.cc'
     const getSystemInfoSync =  wx.getSystemInfoSync()
-    console.log('=====FIX_URL=====')
-    console.log(getSystemInfoSync)
     if (getSystemInfoSync.platform !== 'devtools') {
         FIX_URL = 'https://yqy.mynatapp.cc'
     } else {
